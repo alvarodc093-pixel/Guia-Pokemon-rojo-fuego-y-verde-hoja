@@ -18,7 +18,7 @@ let lastFocus = null;
 
 /* Pestañas independientes (sin scroll infinito). Debe ir antes de init()
    porque initTabs() lo usa durante el arranque. */
-const TABS = ["pokedex", "ediciones", "mapa", "guia", "recursos"];
+const TABS = ["pokedex", "mecanicas", "ediciones", "mapa", "guia", "recursos"];
 
 init();
 
@@ -27,6 +27,7 @@ async function init() {
   safe("nav", initNav);
   safe("tabs", initTabs);
   safe("dex", initPokedex);
+  safe("mecanics", initMechanics);
   safe("grids", initGridEvents);
   safe("modal", initModal);
   safe("guide", initGuide);
@@ -318,6 +319,7 @@ function dexEntry(id) {
     types: (base && base.types) || (typeof TYPES_ALL !== "undefined" && TYPES_ALL[id]) || [],
     edition: edMap.get(id) || (base && base.edition) || null,
     frlg: base && base.frlg,
+    stats: (base && base.stats) || null,
   };
 }
 
@@ -408,7 +410,11 @@ async function selectDex(id, opts = {}) {
   const p = dexEntry(id);
   detail.innerHTML = dexLoadingHTML(displayName(p.slug));
   try {
-    const frlg = p.frlg || (await fetchFrlgMoves(id));
+    // Una sola llamada viva: da estadísticas (para la naturaleza) y movimientos FRLG.
+    const live = await fetchPokemon(id).catch(() => null);
+    if (!p.stats && live) p.stats = live.stats;
+    const frlg = (live && live.frlg) || p.frlg ||
+      (await fetchFrlgMoves(id).catch(() => null)) || { level: [], machine: [], tutor: [] };
     const slugs = [...frlg.level.map((m) => m.slug), ...frlg.machine, ...frlg.tutor];
     const infos = await Promise.all(slugs.map((s) => fetchMoveDetail(s).catch(() => null)));
     const bySlug = new Map(infos.filter(Boolean).map((i) => [i.slug, i]));
