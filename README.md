@@ -40,6 +40,7 @@ Pokemon/
     │   └── main.css        # Sistema de diseño (variables, split, cards, responsive)
     └── js/
         ├── data.js         # Exclusivos, tipos, ubicaciones, DEX 1-251 y tipos
+        ├── mechanics.js    # Naturaleza óptima por Pokémon, 25 naturalezas y tabla de tipos
         ├── playlist.js     # 36 capítulos + 50 shorts de la guía en vídeo
         ├── api.js          # PokéAPI: datos vivos, evoluciones, movimientos, encuentros
         ├── ui.js           # Tarjetas, recortes, Pokédex, modal, toast, favoritos
@@ -47,16 +48,22 @@ Pokemon/
 ```
 
 La página funciona por **pestañas independientes** (sin scroll infinito):
-Pokédex · Ediciones · Mapa · Guía en vídeo · Recursos. La portada
+Pokédex · Mecánicas · Ediciones · Mapa · Guía en vídeo · Recursos. La portada
 (pokébola + logo + split rojo/verde) siempre queda visible arriba.
 Para añadir una pestaña nueva: crea la sección
 `tabpanel` en `index.html`, su botón `tab` y añade su nombre al array
 `TABS` de `src/js/app.js`.
 
+La pestaña **Mecánicas** reúne las 25 naturalezas (nombre ES + EN, efecto
+±10% y para qué sirve cada una), los 18 tipos con su símbolo e interacciones
+(fuerte/débil/resiste/inmune) y la tabla 18×18 de eficacias.
+
 La **Pokédex** cubre Kanto + Johto (1–251) con estética tipo pokemon.com:
 imagen oficial, buscador y filtro por región; al elegir uno, ficha con
 ubicación y probabilidad (`LOC` de RankedBoost para Kanto, encuentros de
-PokéAPI para Johto), cadena evolutiva con niveles/métodos y ataques por
+PokéAPI para Johto), la **naturaleza óptima y una alternativa** calculadas
+sobre sus estadísticas base (con traducción al inglés y explicación),
+cadena evolutiva con niveles/métodos y ataques por
 nivel, MT/MO y tutor (nombres en español vía PokéAPI, con caché en memoria).
 
 Cada archivo tiene una responsabilidad única. Para añadir una funcionalidad nueva,
