@@ -504,6 +504,83 @@ a.live-btn { color: #111; }
 }
 .toast[hidden] { display: none; }
 
+/* ---------- Naturaleza óptima (ficha Pokédex + modal) ---------- */
+.nat-cards { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.nat-card {
+  border: 1.5px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 12px 14px; background: #f8fafc; box-shadow: var(--shadow-sm);
+}
+.nat-card--opt { border-color: var(--color-accent); background: linear-gradient(180deg, #fffdf3, #fff); }
+.nat-card--alt { background: linear-gradient(180deg, #f5f7ff, #fff); }
+.nat-tag {
+  margin: 0 0 4px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--color-muted);
+}
+.nat-card--opt .nat-tag { color: #a06a00; }
+.nat-name { margin: 0 0 6px; font-size: 1.08rem; text-transform: capitalize; }
+.nat-en { font-size: 0.85rem; font-weight: 700; color: var(--color-muted); text-transform: none; }
+.nat-effect { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.nat-up, .nat-down, .nat-neutral {
+  font-size: 0.78rem; font-weight: 800; border-radius: var(--radius-pill);
+  padding: 3px 10px; border: 1px solid var(--color-border); white-space: nowrap;
+}
+.nat-up { background: #ffe4f0; border-color: #fbcfe8; color: #9d174d; }
+.nat-down { background: #dbeafe; border-color: #bfdbfe; color: #1e3a8a; }
+.nat-neutral { background: #f1f5f9; color: var(--color-muted); }
+.nat-why { margin: 0; font-size: 0.88rem; color: var(--color-muted); }
+
+/* ---------- Pestaña Mecánicas ---------- */
+.mech-sub { margin: var(--spacing-xl) 0 6px; font-size: 1.35rem; }
+.mech-count { color: var(--color-muted); font-weight: 700; font-size: 1rem; }
+.mech-note { color: var(--color-muted); max-width: 80ch; margin-top: 0; }
+.mech-none { color: var(--color-muted); font-size: 0.85rem; font-style: italic; }
+
+.nature-grid {
+  display: grid; gap: 10px; margin-top: var(--spacing-md);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+.nature-item {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent-ink); border-radius: var(--radius-md);
+  padding: 12px 14px; box-shadow: var(--shadow-sm);
+}
+.nature-item--neutral { border-left-color: #cbd5e1; background: #f8fafc; }
+.nature-item-name { margin: 0 0 6px; font-size: 1rem; text-transform: capitalize; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.nature-item-en { font-size: 0.82rem; font-weight: 700; color: var(--color-muted); }
+.nature-item-effect { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.nature-item-desc { margin: 0; font-size: 0.85rem; color: var(--color-muted); }
+
+.type-grid {
+  display: grid; gap: 12px; margin-top: var(--spacing-md);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+.type-card {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm);
+}
+.type-card-name { margin: 0 0 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.type-card-en { font-size: 0.85rem; font-weight: 700; color: var(--color-muted); }
+.type-chip--lg { font-size: 0.82rem; padding: 5px 14px; letter-spacing: 0.6px; }
+.type-card-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 0.86rem; }
+.type-card-list strong { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--color-muted); }
+.type-card-list .type-chip { font-size: 0.62rem; padding: 2px 8px; }
+
+/* Tabla de eficacias 18×18 */
+.chart-table { min-width: 720px; font-size: 0.78rem; text-align: center; }
+.chart-table th, .chart-table td { padding: 5px 4px; border: 1px solid var(--color-border); white-space: nowrap; }
+.chart-table thead th { background: #eef2ff; font-size: 0.95rem; }
+.chart-table tbody th { background: #f8fafc; font-weight: 800; text-align: left; font-size: 0.8rem; position: sticky; left: 0; }
+.chart-corner { background: #eef2ff !important; font-size: 0.68rem !important; text-align: left !important; min-width: 120px; }
+.chart-table td span { font-weight: 800; }
+.eff-2 { background: #dcfce7; color: #14532d; }
+.eff-h { background: #fef3c7; color: #92400e; }
+.eff-0 { background: #fee2e2; color: #991b1b; }
+.eff-n { background: #fff; color: #94a3b8; }
+.eff-legend {
+  display: inline-block; font-weight: 800; border-radius: 6px;
+  padding: 1px 7px; border: 1px solid var(--color-border);
+}
+
 /* ---------- Breakpoints ---------- */
 @media (min-width: 640px) {
   .nav-toggle { display: none; }
@@ -530,6 +607,7 @@ a.live-btn { color: #111; }
   .poke-media img { width: 80px; height: 80px; }
   .link-grid { grid-template-columns: repeat(3, 1fr); }
   .cutout-btn img { width: 54px; height: 54px; }
+  .nat-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width: 1400px) {
   .dex-layout { grid-template-columns: 420px minmax(0, 1fr); }
