@@ -46,6 +46,7 @@
         <ul class="nav-menu" id="navMenu">
           <li><a href="#portada">Portada</a></li>
           <li><a href="#pokedex" data-tab="pokedex">Pokédex</a></li>
+          <li><a href="#mecanicas" data-tab="mecanicas">Mecánicas</a></li>
           <li><a href="#ediciones" data-tab="ediciones">Ediciones</a></li>
           <li><a href="#mapa" data-tab="mapa">Mapa</a></li>
           <li><a href="#guia" data-tab="guia">Guía en vídeo</a></li>
@@ -117,6 +118,7 @@
       <div class="container">
         <div class="tabs" role="tablist" aria-label="Secciones de la guía">
           <button class="tab" role="tab" id="tab-pokedex" data-tab="pokedex" aria-selected="true" aria-controls="panel-pokedex">Pokédex</button>
+          <button class="tab" role="tab" id="tab-mecanicas" data-tab="mecanicas" aria-selected="false" aria-controls="panel-mecanicas" tabindex="-1">Mecánicas</button>
           <button class="tab" role="tab" id="tab-ediciones" data-tab="ediciones" aria-selected="false" aria-controls="panel-ediciones" tabindex="-1">Ediciones</button>
           <button class="tab" role="tab" id="tab-mapa" data-tab="mapa" aria-selected="false" aria-controls="panel-mapa" tabindex="-1">Mapa</button>
           <button class="tab" role="tab" id="tab-guia" data-tab="guia" aria-selected="false" aria-controls="panel-guia" tabindex="-1">Guía en vídeo</button>
@@ -130,7 +132,7 @@
       <div class="container">
         <p class="kicker">Kanto + Johto · 251 Pokémon</p>
         <h2 id="pokedex-title">Pokédex</h2>
-        <p class="section-lead">Toca un Pokémon para ver su ficha completa: imagen, ubicación y probabilidad de captura, evoluciones con sus niveles y todos sus ataques por nivel y por MT/MO.</p>
+        <p class="section-lead">Toca un Pokémon para ver su ficha completa: imagen, ubicación y probabilidad de captura, la <strong>naturaleza óptima</strong> (y una alternativa) junto a su info de captura, evoluciones con sus niveles y todos sus ataques por nivel y por MT/MO.</p>
         <form class="dex-toolbar" id="dexFilterForm" role="search" aria-label="Buscar en la Pokédex" onsubmit="return false">
           <div class="dex-field">
             <label for="dexQ">Buscar</label>
@@ -154,6 +156,28 @@
             <p>Cargando la Pokédex…</p>
           </article>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ MECÁNICAS ============ -->
+    <section class="section section--alt tabpanel" id="panel-mecanicas" data-panel="mecanicas" role="tabpanel" aria-labelledby="tab-mecanicas" tabindex="0" hidden>
+      <div class="container">
+        <p class="kicker">Referencia del entrenador</p>
+        <h2 id="mecanicas-title">Naturalezas y tipos</h2>
+        <p class="section-lead">Las 25 naturalezas del juego con su nombre en español e inglés y qué hace cada una, más los 18 tipos con su símbolo, sus interacciones y la tabla completa de eficacias.</p>
+
+        <h3 class="mech-sub">Naturalezas <span class="mech-count">(25)</span></h3>
+        <p class="mech-note">Cada naturaleza sube una estadística un <strong>10%</strong> y baja otra un <strong>10%</strong>; las 5 neutras no cambian nada. En el juego, la estadística subida se pinta de <strong>rosa</strong> y la bajada de <strong>azul</strong> en la pantalla de Datos.</p>
+        <div class="nature-grid" id="natureGrid"></div>
+
+        <h3 class="mech-sub">Tipos <span class="mech-count">(18)</span></h3>
+        <p class="mech-note">Cada tipo con su símbolo, a qué hace doble de daño al atacar, qué le hace doble de daño, qué resiste y a qué es inmune.</p>
+        <div class="type-grid" id="typeGrid"></div>
+
+        <h3 class="mech-sub">Tabla de eficacias</h3>
+        <p class="mech-note">Fila = tipo del ataque · columna = tipo del defensor.</p>
+        <div class="table-wrap"><table class="chart-table" id="typeChart"></table></div>
+        <p class="map-fallback" id="chartLegend"></p>
       </div>
     </section>
 
@@ -280,6 +304,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <script src="src/js/data.js"></script>
+  <script src="src/js/mechanics.js"></script>
   <script src="src/js/api.js"></script>
   <script src="src/js/ui.js"></script>
   <script src="src/js/playlist.js"></script>
