@@ -113,6 +113,7 @@ function modalHTML(p, edition) {
     </dl>
     <p style="margin:6px 0"><strong>Habilidades:</strong> ${(p.abilities || []).map(cap).join(", ") || "—"}</p>
     ${locationsHTML(p)}
+    ${natureCardsHTML(p.stats)}
     <h3 style="margin:12px 0 6px">Estadísticas base</h3>
     ${stats || "<p>Sin datos de estadísticas.</p>"}
     <div class="modal-actions">
@@ -218,6 +219,7 @@ function dexDetailHTML(p, evoTree, moves, locSection) {
       </div>
     </header>
     ${locSection}
+    ${natureCardsHTML(p.stats)}
     <h3 class="dex-sub">Evoluciones</h3>
     ${evoTree ? evoChainHTML(evoTree, p.id) : `<p>Sin datos de evolución.</p>`}
     <h3 class="dex-sub">Ataques por nivel</h3>
