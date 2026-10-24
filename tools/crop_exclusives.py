@@ -1,15 +1,16 @@
 """Recorta los sprites individuales de la tabla japonesa FRLG.
 Mitad superior -> Rojo Fuego (22), mitad inferior -> Verde Hoja (23).
-Uso: python crop_exclusives.py
+Uso: python tools/crop_exclusives.py RUTA_DE_LA_TABLA.jpg
 """
 import os
+import sys
 import tempfile
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-# Ruta de la tabla japonesa original (mitad sup. = Rojo Fuego, mitad inf. = Verde Hoja)
-SRC = r"C:\Users\crazy\OneDrive\Pictures\EUHMUQL3Q5DYVE5XTZMXNEX46I.jpg"
+# Tabla japonesa original (mitad sup. = Rojo Fuego, mitad inf. = Verde Hoja), por argumento
+SRC = sys.argv[1] if len(sys.argv) > 1 else "EUHMUQL3Q5DYVE5XTZMXNEX46I.jpg"
 PROJ = str(Path(__file__).resolve().parent.parent)  # raiz del proyecto (carpeta Pokemon/)
 TMP = tempfile.gettempdir()  # hojas de QA: sheet-fire.png, sheet-leaf.png, debug-overlay.jpg
 
