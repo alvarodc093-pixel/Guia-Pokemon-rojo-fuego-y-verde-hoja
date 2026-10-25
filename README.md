@@ -1,12 +1,21 @@
 # Guía Pokémon Rojo Fuego y Verde Hoja
 
-Guía web en español de las ediciones Rojo Fuego y Verde Hoja (relanzadas en Switch 2): Pokédex de Kanto y Johto, los exclusivos de cada edición, dónde capturar cada Pokémon, naturalezas recomendadas, mapa y guía en vídeo.
+**Guía web de las ediciones Rojo Fuego y Verde Hoja: Pokédex de 251 Pokémon, exclusivos de cada edición, ubicaciones, naturalezas y guía en vídeo.**
 
-**Web:** https://pokemon-rojo-fuego-verde-hojavercel.vercel.app
+[![Demo](https://img.shields.io/badge/Demo-en%20vivo-2ea44f?style=flat-square)](https://pokemon-rojo-fuego-verde-hojavercel.vercel.app) ![JavaScript](https://img.shields.io/badge/JavaScript-vanilla-F7DF1E?style=flat-square&logo=javascript&logoColor=black) ![HTML](https://img.shields.io/badge/HTML-CSS-E34F26?style=flat-square&logo=html5&logoColor=white) ![PokéAPI](https://img.shields.io/badge/PokéAPI-datos%20en%20vivo-EF5350?style=flat-square)
 
-HTML, CSS y JavaScript sin frameworks ni build. Los datos se cargan en vivo desde [PokéAPI](https://pokeapi.co).
+![Portada de la guía](docs/img/portada.png)
+
+## En resumen
+
+- **Qué es:** una web sin frameworks ni build que combina datos en vivo de PokéAPI con datos propios de ubicaciones y naturalezas.
+- **Datos:** PokéAPI para estadísticas, evoluciones y ataques; RankedBoost para las ubicaciones de Kanto.
+- **Destacado:** cada ficha calcula la naturaleza óptima a partir de las estadísticas base y muestra dónde capturar el Pokémon con su probabilidad.
+- **Calidad:** accesible con teclado, responsive y con datos de respaldo si falla la API.
 
 ## Qué tiene
+
+![Ficha de la Pokédex](docs/img/pokedex.png)
 
 - **Pokédex (1–251):** buscador y filtro por región. Cada ficha muestra dónde se captura (zona, método, niveles y probabilidad), la naturaleza recomendada según sus estadísticas base y una alternativa, la cadena evolutiva y los ataques por nivel, MT/MO y tutor. Se pueden marcar los capturados y se guardan en el navegador.
 - **Ediciones:** los 22 exclusivos de Rojo Fuego y los 23 de Verde Hoja, con su ficha al pulsar.
