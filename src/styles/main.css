@@ -529,6 +529,19 @@ a.live-btn { color: #111; }
 .nat-neutral { background: #f1f5f9; color: var(--color-muted); }
 .nat-why { margin: 0; font-size: 0.88rem; color: var(--color-muted); }
 
+/* ---------- Set recomendado (ficha Pokédex) ---------- */
+.set-role { margin: 0 0 8px; font-weight: 700; }
+.set-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.set-card {
+  border: 1.5px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 10px 14px; background: #fff; box-shadow: var(--shadow-sm);
+}
+.set-card--support { background: #f8fafc; border-style: dashed; }
+.set-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 0 0 6px; }
+.set-name { font-size: 1.02rem; }
+.set-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 0.85rem; color: var(--color-muted); }
+.set-meta .type-chip { font-size: 0.62rem; padding: 2px 8px; }
+
 /* ---------- Pestaña Mecánicas ---------- */
 .mech-sub { margin: var(--spacing-xl) 0 6px; font-size: 1.35rem; }
 .mech-count { color: var(--color-muted); font-weight: 700; font-size: 1rem; }
@@ -588,6 +601,7 @@ a.live-btn { color: #111; }
   .nav-menu a { color: #e2e8f0; padding: 8px 12px; }
   .nav-menu a:hover { background: rgb(255 255 255 / 0.12); color: #fff; }
   .link-grid { grid-template-columns: repeat(2, 1fr); }
+  .set-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dex-toolbar { grid-template-columns: 2fr 1fr; align-items: end; }
   .dex-list { grid-template-columns: repeat(3, 1fr); }
   .pokeball { width: 150px; height: 150px; }

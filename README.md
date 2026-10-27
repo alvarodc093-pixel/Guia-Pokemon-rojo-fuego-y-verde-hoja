@@ -17,7 +17,7 @@
 
 ![Ficha de la Pokédex](docs/img/pokedex.png)
 
-- **Pokédex (1–251):** buscador y filtro por región. Cada ficha muestra dónde se captura (zona, método, niveles y probabilidad), la naturaleza recomendada según sus estadísticas base y una alternativa, la cadena evolutiva y los ataques por nivel, MT/MO y tutor. Se pueden marcar los capturados y se guardan en el navegador.
+- **Pokédex (1–251):** buscador y filtro por región. Cada ficha muestra dónde se captura (zona, método, niveles y probabilidad), la naturaleza recomendada según sus estadísticas base y una alternativa, un set recomendado de cuatro ataques (potencia, STAB y cobertura con las reglas de la 3.ª generación), la cadena evolutiva y los ataques por nivel, MT/MO y tutor. Se pueden marcar los capturados y se guardan en el navegador.
 - **Ediciones:** los 22 exclusivos de Rojo Fuego y los 23 de Verde Hoja, con su ficha al pulsar.
 - **Mecánicas:** las 25 naturalezas con su efecto y uso, los 18 tipos y la tabla de eficacias 18×18.
 - **Mapa:** mapa interactivo de Kanto (RankedBoost).
@@ -32,6 +32,7 @@ La interfaz es accesible con teclado (pestañas con flechas, modal con Escape y 
 - **Ubicaciones de Kanto:** [Pokédex FRLG de RankedBoost](https://rankedboost.com/pokemon/pokedex/firered-leafgreen/), guardadas en `src/js/data.js`. Para Johto se usan los encuentros de PokéAPI.
 - **Exclusivos:** contrastados con las guías del relanzamiento (febrero de 2026) y con RankedBoost. Deoxys es un caso aparte (forma Ataque en Rojo Fuego y Defensa en Verde Hoja) y se explica en una nota, porque PokéAPI lo sirve como un único Pokémon.
 - **Naturalezas:** calculadas en `src/js/mechanics.js` a partir de las estadísticas base de cada Pokémon.
+- **Set recomendado:** elegido en `src/js/mechanics.js` entre los ataques que aprende en RFVH (nivel, MT/MO y tutor). Potencias, precisiones y tipos de la 3.ª generación (PokéAPI los da en `past_values`), y la categoría física o especial la decide el tipo del ataque.
 - **Imágenes de cabecera:** recortes de una tabla de exclusivos, generados con los scripts de `tools/`.
 
 ## Ejecutarlo

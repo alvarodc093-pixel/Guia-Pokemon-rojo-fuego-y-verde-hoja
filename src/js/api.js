@@ -172,17 +172,39 @@ async function fetchEvoChain(id) {
   return tree;
 }
 
-/* Detalle de un movimiento: nombre en español, tipo, potencia, precisión y nº de MT/MO en FRLG. */
+/* PokéAPI sirve los valores actuales; past_values guarda los anteriores a cada cambio.
+   El valor de FRLG (grupo 7) es el del primer cambio posterior a la 3.ª generación
+   (se saltan Colosseum y XD, grupos 12 y 13, que también son de la 3.ª). */
+const FRLG_VG = 7;
+const GEN3_VG_LATER = new Set([12, 13]);
+function gen3Values(raw) {
+  const out = { power: raw.power, accuracy: raw.accuracy, type: raw.type ? raw.type.name : null };
+  const later = (raw.past_values || [])
+    .map((p) => ({ p, vg: dexIdFromUrl(p.version_group && p.version_group.url) }))
+    .filter((x) => x.vg > FRLG_VG && !GEN3_VG_LATER.has(x.vg))
+    .sort((a, b) => a.vg - b.vg);
+  for (const field of ["power", "accuracy", "type"]) {
+    const hit = later.find((x) => x.p[field] != null);
+    if (hit) out[field] = field === "type" ? hit.p.type.name : hit.p[field];
+  }
+  return out;
+}
+
+/* Detalle de un movimiento: nombre en español, tipo, potencia y precisión en FRLG y nº de MT/MO. */
 const moveCache = new Map();
 async function fetchMoveDetail(slug) {
   if (moveCache.has(slug)) return moveCache.get(slug);
   const raw = await fetchJSON(`${API_ROOT}move/${slug}/`);
+  const g3 = gen3Values(raw);
+  const meta = raw.meta || {};
   const out = {
     slug,
     nameEs: esName(raw) || pretty(slug),
-    type: raw.type ? raw.type.name : null,
-    power: raw.power,
-    accuracy: raw.accuracy,
+    type: g3.type,
+    power: g3.power,
+    accuracy: g3.accuracy,
+    status: !!(raw.damage_class && raw.damage_class.name === "status"),
+    hits: meta.min_hits && meta.max_hits ? (meta.min_hits === meta.max_hits ? meta.min_hits : 3) : 1,
     mt: null,
   };
   const mach = (raw.machines || []).find((m) => m.version_group && m.version_group.name === "firered-leafgreen");

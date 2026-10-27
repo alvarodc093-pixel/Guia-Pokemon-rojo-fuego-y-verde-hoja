@@ -220,6 +220,7 @@ function dexDetailHTML(p, evoTree, moves, locSection) {
     </header>
     ${locSection}
     ${natureCardsHTML(p.stats)}
+    ${movesetHTML(p, moves)}
     <h3 class="dex-sub">Evoluciones</h3>
     ${evoTree ? evoChainHTML(evoTree, p.id) : `<p>Sin datos de evolución.</p>`}
     <h3 class="dex-sub">Ataques por nivel</h3>
