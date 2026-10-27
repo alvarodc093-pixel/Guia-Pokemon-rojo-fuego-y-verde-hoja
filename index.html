@@ -6,8 +6,10 @@
   <title>Pokémon Rojo Fuego y Verde Hoja — Guía de ediciones Switch 2 | Exclusivos</title>
   <meta name="description" content="Guía en español de Pokémon Rojo Fuego y Verde Hoja (Switch 2): qué Pokémon son exclusivos de cada edición, buscador con datos en vivo de PokéAPI, guía en vídeo y recursos oficiales." />
   <meta name="theme-color" content="#0f172a" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://raw.githubusercontent.com https://upload.wikimedia.org https://i.ytimg.com; connect-src https://pokeapi.co; frame-src https://www.youtube-nocookie.com https://rankedboost.com; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta property="og:title" content="Pokémon Rojo Fuego y Verde Hoja — Guía de ediciones" />
-  <meta property="og:description" content="Mitad roja, mitad verde: consulta los Pokémon exclusivos de cada edición, filtra, guarda favoritos y aprende con vídeos." />
+  <meta property="og:description" content="Mitad roja, mitad verde: consulta los Pokémon exclusivos de cada edición, la Pokédex con sets recomendados, marca tus capturas y aprende con vídeos." />
   <meta property="og:type" content="website" />
   <link rel="canonical" href="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex" />
   <meta property="og:url" content="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex" />
@@ -76,7 +78,7 @@
           src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pok%C3%A9mon_logo.svg"
           alt="Logotipo oficial de Pokémon"
           width="420" height="153" fetchpriority="high"
-          onerror="this.outerHTML='<p class=&quot;pokemon-logo-fallback&quot;>Pokémon</p>'" />
+          data-fallback-text="Pokémon" />
 
         <h1 id="hero-title" class="hero-title">
           <span class="hero-title-fire">Rojo Fuego</span>
@@ -85,7 +87,7 @@
         </h1>
         <p class="hero-subtitle">
           Guía de las ediciones de <strong>Switch&nbsp;2</strong>: consulta qué Pokémon son
-          <strong>exclusivos de cada edición</strong>, filtra por tipo, guarda favoritos y aprende con vídeos.
+          <strong>exclusivos de cada edición</strong>, busca en la Pokédex, marca tus capturas y aprende con vídeos.
         </p>
         <p class="hero-source">
           🌐 <strong>Página online:</strong>
@@ -132,8 +134,8 @@
       <div class="container">
         <p class="kicker">Kanto + Johto · 251 Pokémon</p>
         <h2 id="pokedex-title">Pokédex</h2>
-        <p class="section-lead">Toca un Pokémon para ver su ficha completa: imagen, ubicación y probabilidad de captura, la <strong>naturaleza óptima</strong> (y una alternativa) junto a su info de captura, evoluciones con sus niveles y todos sus ataques por nivel y por MT/MO.</p>
-        <form class="dex-toolbar" id="dexFilterForm" role="search" aria-label="Buscar en la Pokédex" onsubmit="return false">
+        <p class="section-lead">Toca un Pokémon para ver su ficha completa: imagen, ubicación y probabilidad de captura, la <strong>naturaleza óptima</strong> (y una alternativa), un <strong>set recomendado</strong> de cuatro ataques, evoluciones con sus niveles y todos sus ataques por nivel y por MT/MO.</p>
+        <form class="dex-toolbar" id="dexFilterForm" role="search" aria-label="Buscar en la Pokédex">
           <div class="dex-field">
             <label for="dexQ">Buscar</label>
             <input id="dexQ" name="dexQ" type="search" placeholder="Nombre o número… (ej.: pikachu, 025)" autocomplete="off" />
@@ -150,7 +152,7 @@
         <p class="dex-count" id="dexCount" role="status" aria-live="polite">251 Pokémon</p>
         <div class="dex-layout">
           <div class="dex-list-wrap">
-            <ol class="dex-list" id="dexList" aria-label="Lista de Pokémon exclusivos"></ol>
+            <ol class="dex-list" id="dexList" aria-label="Lista de Pokémon de la Pokédex"></ol>
           </div>
           <article class="dex-detail" id="dexDetail" aria-live="polite" aria-label="Ficha del Pokémon seleccionado">
             <p>Cargando la Pokédex…</p>
@@ -235,7 +237,7 @@
         <h2 id="mapa-title">Mapa interactivo de Kanto y las Archi7</h2>
         <p class="section-lead">El FRLG Map de RankedBoost, incrustado en la página: mueve, amplía y localiza rutas, cuevas y puntos de captura sin salir de aquí.</p>
         <div class="map-frame">
-          <iframe id="frlgMap" src="https://rankedboost.com/pokemon/location/firered-leafgreen/#megamap=4048,-960,0.085,region,-" title="Mapa interactivo de Pokémon Rojo Fuego y Verde Hoja (RankedBoost)" loading="lazy" allowfullscreen referrerpolicy="no-referrer"></iframe>
+          <iframe id="frlgMap" src="https://rankedboost.com/pokemon/location/firered-leafgreen/#megamap=4048,-960,0.085,region,-" title="Mapa interactivo de Pokémon Rojo Fuego y Verde Hoja (RankedBoost)" loading="lazy" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
         </div>
         <p class="map-fallback">¿No se carga el mapa? <a href="https://rankedboost.com/pokemon/location/firered-leafgreen/" target="_blank" rel="noopener">Abrirlo en RankedBoost</a>.</p>
       </div>
@@ -309,28 +311,5 @@
   <script src="src/js/ui.js"></script>
   <script src="src/js/playlist.js"></script>
   <script src="src/js/app.js"></script>
-  <script>
-    // Botón "Copiar enlace": copia la URL online al portapapeles.
-    (function () {
-      var btn = document.getElementById("copyLiveUrl");
-      if (!btn) return;
-      btn.addEventListener("click", function () {
-        var url = "https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex";
-        function done(msg) {
-          btn.textContent = msg;
-          setTimeout(function () { btn.textContent = "Copiar enlace"; }, 2000);
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(function () { done("¡Copiado! ✓"); }, function () { done(url); });
-        } else {
-          var t = document.createElement("textarea");
-          t.value = url; document.body.appendChild(t); t.select();
-          try { document.execCommand("copy"); done("¡Copiado! ✓"); }
-          catch (e) { done(url); }
-          document.body.removeChild(t);
-        }
-      });
-    })();
-  </script>
 </body>
 </html>

@@ -121,7 +121,7 @@ a.live-btn { color: #111; }
 .hero-half--leaf { background: linear-gradient(225deg, #4ade80 0%, var(--color-leaf) 45%, var(--color-leaf-dark) 100%); }
 .hero-split::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgb(15 23 42 / 0.15), rgb(15 23 42 / 0.55)); }
 .hero-content { position: relative; z-index: 2; text-align: center; padding-block: var(--spacing-2xl); }
-.hero-content a { color: #ffe98a; }
+.hero-content a:not(.btn) { color: #ffe98a; }
 
 .pokeball {
   width: 120px; height: 120px; border-radius: 50%; margin: 0 auto var(--spacing-md);
@@ -528,6 +528,8 @@ a.live-btn { color: #111; }
 .nat-down { background: #dbeafe; border-color: #bfdbfe; color: #1e3a8a; }
 .nat-neutral { background: #f1f5f9; color: var(--color-muted); }
 .nat-why { margin: 0; font-size: 0.88rem; color: var(--color-muted); }
+
+.dex-empty { grid-column: 1 / -1; padding: 12px; color: var(--color-muted); }
 
 /* ---------- Set recomendado (ficha Pokédex) ---------- */
 .set-role { margin: 0 0 8px; font-weight: 700; }

@@ -24,6 +24,8 @@ init();
 
 async function init() {
   // Cada subsistema va protegido: si uno falla, el resto sigue funcionando.
+  safe("images", initImageFallbacks);
+  safe("copy", initCopyLink);
   safe("nav", initNav);
   safe("tabs", initTabs);
   safe("dex", initPokedex);
@@ -52,7 +54,6 @@ async function init() {
   }
 }
 
-/* ---------- Navegación móvil ---------- */
 function safe(name, fn) {
   try {
     fn();
@@ -60,6 +61,51 @@ function safe(name, fn) {
     console.error(`[init:${name}]`, err);
   }
 }
+
+/* Imágenes con respaldo: data-fallback (otra URL) o data-fallback-text (texto).
+   Sustituye a los onerror en línea, que la Content-Security-Policy bloquea. */
+function imageFallback(img) {
+  if (img.dataset.fallback) {
+    const alt = img.dataset.fallback;
+    delete img.dataset.fallback; // un solo intento
+    img.src = alt;
+  } else if (img.dataset.fallbackText) {
+    const p = document.createElement("p");
+    p.className = "pokemon-logo-fallback";
+    p.textContent = img.dataset.fallbackText;
+    img.replaceWith(p);
+  }
+}
+
+function initImageFallbacks() {
+  document.addEventListener("error", (e) => {
+    if (e.target instanceof HTMLImageElement) imageFallback(e.target);
+  }, true);
+  // Las que fallaron antes de cargar este script (el logo va arriba del todo).
+  document.querySelectorAll("img[data-fallback], img[data-fallback-text]").forEach((img) => {
+    if (img.complete && img.naturalWidth === 0) imageFallback(img);
+  });
+}
+
+/* Botón "Copiar enlace" del banner superior. */
+function initCopyLink() {
+  const btn = $("#copyLiveUrl");
+  if (!btn) return;
+  const url = $("#liveUrl").href;
+  const done = (msg) => {
+    btn.textContent = msg;
+    setTimeout(() => { btn.textContent = "Copiar enlace"; }, 2000);
+  };
+  btn.addEventListener("click", () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => done("¡Copiado! ✓"), () => done(url));
+    } else {
+      done(url);
+    }
+  });
+}
+
+/* ---------- Navegación móvil ---------- */
 
 function initNav() {
   const btn = $("#navToggle");
@@ -126,10 +172,6 @@ function activateTab(name, opts = {}) {
 }
 
 /* ---------- Guía en vídeo: reproductor + lista ---------- */
-function esc(s = "") {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
 function initGuide() {
   const eps = $("#playlistEps");
   const shorts = $("#playlistShorts");
@@ -225,8 +267,8 @@ function updateCaughtCounts() {
   const dexCount = $("#dexCount");
   if (dexCount) {
     const total = (typeof DEX_ALL !== "undefined" ? DEX_ALL.length : 251);
-    // Si hay filtro activo, muestra "visibles de total · X capturados"
-    const visible = document.querySelectorAll("#dexList .dex-cell").length || total;
+    // Con filtro activo muestra "visibles de total · X capturados" (también 0 de 251).
+    const visible = typeof DEX_ALL !== "undefined" ? dexFiltered().length : total;
     dexCount.textContent = `${visible} de ${total} · ${caught.size} capturados`;
   }
   if (store.length) {
@@ -263,9 +305,6 @@ async function onGridClick(e) {
   if (!btn) return;
   const id = Number(btn.dataset.id);
   if (btn.dataset.action === "caught") {
-    handleCaughtClick(btn, id);
-  } else if (btn.dataset.action === "fav") {
-    // Compat: la estrella antigua ahora es captura.
     handleCaughtClick(btn, id);
   } else if (btn.dataset.action === "detail") {
     await openModal(id);
@@ -324,6 +363,7 @@ function dexEntry(id) {
 }
 
 function initPokedex() {
+  $("#dexFilterForm").addEventListener("submit", (e) => e.preventDefault());
   $("#dexList").addEventListener("click", (e) => {
     const c = e.target.closest("button[data-caught]");
     if (c) {
@@ -357,7 +397,9 @@ function dexFiltered() {
 function renderDexList() {
   const list = dexFiltered();
   const caught = getCaught();
-  $("#dexList").innerHTML = dexListHTML(list, selectedDexId, caught);
+  $("#dexList").innerHTML = list.length
+    ? dexListHTML(list, selectedDexId, caught)
+    : `<li class="dex-empty">Ningún Pokémon coincide con «${esc($("#dexQ").value.trim())}».</li>`;
   // Sin scroll interno: la lista fluye en la página, solo actualizamos el contador.
   updateCaughtCounts();
   if (list.length && !list.some((p) => p.id === selectedDexId)) {
@@ -424,8 +466,12 @@ async function selectDex(id, opts = {}) {
       tutor: frlg.tutor.map((s) => ({ slug: s, info: bySlug.get(s) || null })),
     };
     const evo = await fetchEvoChain(id).catch(() => null);
-    detail.innerHTML = dexDetailHTML(p, evo, moves, await dexLocSection(p, evo));
+    const loc = await dexLocSection(p, evo);
+    // Si mientras cargaba se eligió otro Pokémon, esta respuesta ya no vale.
+    if (selectedDexId !== id) return;
+    detail.innerHTML = dexDetailHTML(p, evo, moves, loc);
   } catch {
+    if (selectedDexId !== id) return;
     detail.innerHTML = dexErrorHTML();
   }
   if (opts.scroll !== false) detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -438,7 +484,9 @@ function initModal() {
     if (e.target === modalBackdrop) closeModal();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modalBackdrop.hidden) closeModal();
+    if (modalBackdrop.hidden) return;
+    if (e.key === "Escape") closeModal();
+    else if (e.key === "Tab") trapFocus(e);
   });
   modalBody.addEventListener("click", (e) => {
     const btn = e.target.closest('button[data-action="caught"]');
@@ -457,7 +505,9 @@ function initModal() {
   });
 }
 
+let modalRequest = 0;
 async function openModal(id) {
+  const req = ++modalRequest;
   lastFocus = document.activeElement;
   modalBackdrop.hidden = false;
   document.body.style.overflow = "hidden";
@@ -469,10 +519,22 @@ async function openModal(id) {
       const live = await fetchPokemon(id);
       p = { ...p, ...live };
     }
+    if (req !== modalRequest || modalBackdrop.hidden) return;
     modalBody.innerHTML = modalHTML(p, p.edition);
   } catch {
+    if (req !== modalRequest || modalBackdrop.hidden) return;
     modalBody.innerHTML = `<h2 id="modalName">Error</h2><p>No se pudo cargar el detalle del nº ${id}. Revisa tu conexión e inténtalo de nuevo.</p>`;
   }
+}
+
+/* Tab y Mayús+Tab dan la vuelta dentro del modal en vez de salir a la página. */
+function trapFocus(e) {
+  const items = [...$("#modal").querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 }
 
 function closeModal() {

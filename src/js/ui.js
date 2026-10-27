@@ -1,25 +1,5 @@
-/* UI: render de tarjetas, modal, toast, favoritos y filtros.
+/* UI: render de tarjetas, modal, toast, capturados y Pokédex.
    Script clásico: usa los globales de data.js y api.js (ver orden en index.html). */
-const FAV_KEY = "frlg:favs:v1";
-
-function getFavs() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || "[]"));
-  } catch {
-    return new Set();
-  }
-}
-
-function toggleFav(id) {
-  const favs = getFavs();
-  const key = Number(id);
-  if (favs.has(key)) favs.delete(key);
-  else favs.add(key);
-  try {
-    localStorage.setItem(FAV_KEY, JSON.stringify([...favs]));
-  } catch { /* file:// u otros contextos sin almacenamiento */ }
-  return favs;
-}
 
 function cap(name = "") {
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -56,7 +36,7 @@ function cardHTML(p, isCaught) {
         <div class="poke-media">
           <img src="${img}" alt="Arte oficial de ${name}" width="80" height="80"
                loading="lazy" decoding="async"
-               onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png'" />
+               data-fallback="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png" />
           <button class="poke-ball${caught ? " is-caught" : ""}" data-caught="${p.id}"
             aria-pressed="${caught ? "true" : "false"}"
             aria-label="Marcar a ${name} como capturado"
@@ -139,7 +119,7 @@ function stripHTML(list, activeIds) {
         aria-label="Ver ficha de ${label}" title="${label}">
         <img src="${cutoutUrl(p.edition, p.id, p.slug)}" alt="${label}, recorte de la guía"
              width="54" height="54" loading="lazy" decoding="async"
-             onerror="this.onerror=null;this.src='${artworkUrl(p.id)}'" />
+             data-fallback="${artworkUrl(p.id)}" />
       </button>`;
     })
     .join("");
@@ -158,7 +138,9 @@ const CAUGHT_KEY = "frlg:caught:v1";
 
 function getCaught() {
   try {
-    return new Set(JSON.parse(localStorage.getItem(CAUGHT_KEY) || "[]"));
+    // Solo números válidos: el valor guardado puede venir editado o corrupto.
+    const saved = JSON.parse(localStorage.getItem(CAUGHT_KEY) || "[]");
+    return new Set((Array.isArray(saved) ? saved : []).map(Number).filter((n) => Number.isInteger(n) && n > 0 && n <= 386));
   } catch {
     return new Set();
   }

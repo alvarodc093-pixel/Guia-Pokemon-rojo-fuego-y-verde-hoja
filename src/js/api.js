@@ -1,8 +1,28 @@
-/* Servicio PokéAPI: caché en memoria + normalización + concurrencia limitada. */
+/* Servicio PokéAPI: caché en memoria + normalización + concurrencia limitada.
+   Todo texto que llega de la API se escapa aquí, porque la UI lo pinta con innerHTML. */
 
 const cache = new Map();
 const API_ROOT = "https://pokeapi.co/api/v2/";
 const API = `${API_ROOT}pokemon/`;
+
+function esc(s = "") {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+/* Solo URLs https: una imagen se pinta dentro de un atributo src. */
+function safeUrl(url) {
+  return typeof url === "string" && url.startsWith("https://") ? esc(url) : "";
+}
+
+/* Tipos en la 3.ª generación: past_types guarda los anteriores a cada cambio
+   (p. ej. Clefairy era Normal hasta que llegó el tipo Hada). */
+function gen3Types(raw) {
+  const past = (raw.past_types || [])
+    .map((p) => ({ gen: dexIdFromUrl(p.generation && p.generation.url), types: p.types }))
+    .filter((p) => p.gen >= 3)
+    .sort((a, b) => a.gen - b.gen)[0];
+  return ((past ? past.types : raw.types) || []).map((t) => esc(t.type.name));
+}
 
 function normalize(raw) {
   const art =
@@ -11,15 +31,15 @@ function normalize(raw) {
     raw?.sprites?.front_default ||
     "";
   return {
-    id: raw.id,
-    name: raw.name,
-    sprite: art,
-    types: (raw.types || []).map((t) => t.type.name),
-    height: raw.height / 10, // m
-    weight: raw.weight / 10, // kg
-    abilities: (raw.abilities || []).map((a) => a.ability.name),
-    stats: (raw.stats || []).map((s) => ({ name: s.stat.name, value: s.base_stat })),
-    baseExp: raw.base_experience ?? null,
+    id: Number(raw.id),
+    name: esc(raw.name),
+    sprite: safeUrl(art),
+    types: gen3Types(raw),
+    height: Number(raw.height) / 10, // m
+    weight: Number(raw.weight) / 10, // kg
+    abilities: (raw.abilities || []).map((a) => esc(a.ability.name)),
+    stats: (raw.stats || []).map((s) => ({ name: esc(s.stat.name), value: Number(s.base_stat) })),
+    baseExp: raw.base_experience == null ? null : Number(raw.base_experience),
     frlg: extractFrlgMoves(raw.moves),
   };
 }
@@ -71,12 +91,12 @@ async function fetchJSON(url) {
 }
 
 function pretty(slug = "") {
-  return slug.split("-").map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join(" ");
+  return esc(slug).split("-").map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join(" ");
 }
 
 function esName(entry) {
   const n = ((entry && entry.names) || []).find((x) => x.language && x.language.name === "es");
-  return n ? n.name : null;
+  return n ? esc(n.name) : null;
 }
 
 function dexIdFromUrl(url = "") {
@@ -91,7 +111,7 @@ function extractFrlgMoves(moves = []) {
   const tutor = new Set();
   for (const m of moves || []) {
     const slug = m.move && m.move.name;
-    if (!slug) continue;
+    if (!slug || !/^[a-z0-9-]+$/.test(slug)) continue; // también va en URLs y en el HTML
     for (const d of m.version_group_details || []) {
       if (!d.version_group || d.version_group.name !== "firered-leafgreen") continue;
       const method = d.move_learn_method && d.move_learn_method.name;
@@ -141,7 +161,7 @@ function evoEdgeEs(d = {}) {
   if (trigger === "trade") return item ? `Intercambio (${itemEs(item)})` : "Intercambio";
   if (trigger === "use-item") return item ? itemEs(item) : "Objeto";
   if (trigger === "level-up") {
-    if (d.min_level) return `Nv ${d.min_level}`;
+    if (d.min_level) return `Nv ${Number(d.min_level)}`;
     if (d.min_happiness != null) return "Amistad";
     if (d.min_beauty) return "Belleza";
     return "Nivel";
@@ -153,7 +173,7 @@ function evoEdgeEs(d = {}) {
 function parseEvoNode(node) {
   return {
     id: dexIdFromUrl(node.species.url),
-    name: node.species.name,
+    name: esc(node.species.name),
     children: (node.evolves_to || []).map((c) => ({
       edge: evoEdgeEs((c.evolution_details || [])[0] || {}),
       node: parseEvoNode(c),
@@ -200,9 +220,9 @@ async function fetchMoveDetail(slug) {
   const out = {
     slug,
     nameEs: esName(raw) || pretty(slug),
-    type: g3.type,
-    power: g3.power,
-    accuracy: g3.accuracy,
+    type: g3.type && esc(g3.type),
+    power: g3.power == null ? null : Number(g3.power),
+    accuracy: g3.accuracy == null ? null : Number(g3.accuracy),
     status: !!(raw.damage_class && raw.damage_class.name === "status"),
     hits: meta.min_hits && meta.max_hits ? (meta.min_hits === meta.max_hits ? meta.min_hits : 3) : 1,
     mt: null,
@@ -212,7 +232,7 @@ async function fetchMoveDetail(slug) {
     try {
       const mdata = await fetchJSON(mach.machine.url);
       const item = mdata.item && mdata.item.name;
-      if (item) out.mt = item.replace(/^tm/i, "MT").replace(/^hm/i, "MO");
+      if (item) out.mt = esc(item).replace(/^tm/i, "MT").replace(/^hm/i, "MO");
     } catch { /* sin número de MT: se muestra igual */ }
   }
   moveCache.set(slug, out);
@@ -265,9 +285,9 @@ async function fetchDexEncounters(id) {
       for (const d of v.encounter_details || []) {
         const key = `${area}|${d.method.name}`;
         const g = groups.get(key) || { area, method: d.method.name, min: 99, max: 0, chance: 0, eds: new Set() };
-        g.min = Math.min(g.min, d.min_level);
-        g.max = Math.max(g.max, d.max_level);
-        g.chance = Math.max(g.chance, d.chance);
+        g.min = Math.min(g.min, Number(d.min_level));
+        g.max = Math.max(g.max, Number(d.max_level));
+        g.chance = Math.max(g.chance, Number(d.chance));
         g.eds.add(ver === "firered" ? "fire" : "leaf");
         groups.set(key, g);
       }
