@@ -131,6 +131,16 @@ function stripHTML(list, activeIds) {
     .join("");
 }
 
+/* Entradas de los selectores de edición: una por juego de GAMES.
+   target = sección a la que llevan ("portada" o "pokedex"). */
+function editionLinksHTML(target) {
+  return Object.values(GAMES).map((g) => {
+    const cur = g.id === GAME.id ? ' aria-current="page"' : "";
+    return `<li><a href="${g.page}#${target}" data-game="${g.id}" data-target="${target}"${cur}>
+      <span class="nav-sub-dot nav-sub-dot--${g.id}" aria-hidden="true"></span>${g.label}</a></li>`;
+  }).join("");
+}
+
 /* Nombre para mostrar (casos especiales: Nidoran, Farfetch'd...). */
 function displayName(slug = "") {
   if (!slug) return "";

@@ -31,6 +31,7 @@ async function init() {
   // Cada subsistema va protegido: si uno falla, el resto sigue funcionando.
   safe("images", initImageFallbacks);
   safe("nav", initNav);
+  safe("editions", initEditionPickers);
   safe("tabs", initTabs);
   safe("dex", initPokedex);
   safe("mecanics", initMechanics);
@@ -105,34 +106,45 @@ function initNav() {
     if (e.target.closest("a")) {
       menu.classList.remove("open");
       btn.setAttribute("aria-expanded", "false");
-      setDexMenu(false);
-    }
-  });
-  // Desplegable "Pokédex": una entrada por juego de la guía.
-  const dexBtn = $("#dexMenuBtn");
-  dexBtn.addEventListener("click", () => setDexMenu(dexBtn.getAttribute("aria-expanded") !== "true"));
-  // La entrada del juego actual no recarga la página: solo abre la pestaña.
-  $("#dexMenu").addEventListener("click", (e) => {
-    const a = e.target.closest("a[data-game]");
-    if (!a || a.dataset.game !== GAME.id) return;
-    e.preventDefault();
-    setDexMenu(false);
-    activateTab("pokedex");
-  });
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".nav-drop")) setDexMenu(false);
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && dexBtn.getAttribute("aria-expanded") === "true") {
-      setDexMenu(false);
-      dexBtn.focus();
     }
   });
 }
 
-function setDexMenu(open) {
-  $("#dexMenuBtn").setAttribute("aria-expanded", String(open));
-  $("#dexMenu").hidden = !open;
+/* ---------- Selectores de edición ----------
+   Pokéball de la cabecera, Pokéball de la portada y desplegable "Pokédex":
+   cada .ed-toggle abre su lista (aria-controls), rellenada desde GAMES. */
+function initEditionPickers() {
+  document.querySelectorAll("[data-ed-list]").forEach((ul) => {
+    ul.innerHTML = editionLinksHTML(ul.dataset.edList);
+  });
+  const toggles = [...document.querySelectorAll(".ed-toggle")];
+  const setOpen = (btn, open) => {
+    btn.setAttribute("aria-expanded", String(open));
+    document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+  };
+  const closeAll = () => toggles.forEach((b) => setOpen(b, false));
+  toggles.forEach((btn) => btn.addEventListener("click", () => {
+    const open = btn.getAttribute("aria-expanded") !== "true";
+    closeAll();
+    setOpen(btn, open);
+  }));
+  document.addEventListener("click", (e) => {
+    // La entrada del juego actual no recarga la página: va a la sección.
+    const a = e.target.closest(".ed-menu a[data-game]");
+    if (a && a.dataset.game === GAME.id) {
+      e.preventDefault();
+      if (TABS.includes(a.dataset.target)) activateTab(a.dataset.target);
+      else document.getElementById(a.dataset.target)?.scrollIntoView({ behavior: "smooth" });
+    }
+    if (a || !e.target.closest(".ed-picker")) closeAll();
+  });
+  document.addEventListener("keydown", (e) => {
+    const open = toggles.find((b) => b.getAttribute("aria-expanded") === "true");
+    if (e.key === "Escape" && open) {
+      closeAll();
+      open.focus();
+    }
+  });
 }
 
 /* ---------- Pestañas independientes (ver const TABS arriba) ---------- */

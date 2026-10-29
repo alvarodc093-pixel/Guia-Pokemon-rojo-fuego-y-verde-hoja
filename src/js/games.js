@@ -7,6 +7,8 @@ const GAMES = {
   frlg: {
     id: "frlg",
     title: "Rojo Fuego / Verde Hoja",
+    label: "Rojo Fuego y Verde Hoja", // nombre en los selectores de edición
+    page: "index.html",
     editions: {
       fire: { name: "Rojo Fuego", icon: "🔥" },
       leaf: { name: "Verde Hoja", icon: "🍃" },
@@ -28,6 +30,8 @@ const GAMES = {
   sv: {
     id: "sv",
     title: "Escarlata / Púrpura",
+    label: "Escarlata y Púrpura",
+    page: "escarlata-purpura.html",
     editions: {
       fire: { name: "Escarlata", icon: "🔴" },
       leaf: { name: "Púrpura", icon: "🟣" },

@@ -120,11 +120,21 @@ a:hover { text-decoration-thickness: 2px; }
   border-bottom: 1px solid rgb(255 255 255 / 0.12);
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
-.brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 600; }
+.brand-wrap { position: relative; }
+.brand {
+  display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font: inherit; font-weight: 600;
+  background: transparent; border: 0; border-radius: 12px; padding: 4px 8px 4px 4px; margin-left: -4px;
+  cursor: pointer; text-align: left;
+}
+.brand:hover, .brand[aria-expanded="true"] { background: rgb(255 255 255 / 0.08); }
+.brand:hover .brand-ball { animation: ball-wiggle 0.7s ease-in-out infinite; }
+.brand[aria-expanded="true"] .brand-ball { rotate: -25deg; }
+.brand[aria-expanded="true"] .nav-drop-caret { transform: rotate(180deg); }
+.brand .nav-drop-caret { display: inline-block; font-size: 0.85em; }
 .brand-text { line-height: 1.15; }
 .brand-game { display: block; font-size: 0.75rem; font-weight: 700; color: var(--fire-tint); letter-spacing: 0.5px; }
 .brand-ball {
-  width: 30px; height: 30px; border-radius: 50%; position: relative; flex: none;
+  width: 30px; height: 30px; border-radius: 50%; position: relative; flex: none; transition: rotate 0.2s ease;
   background: linear-gradient(to bottom, #ee1c25 50%, #fff 50%);
   border: 2px solid #111; overflow: hidden;
 }
@@ -140,6 +150,24 @@ a:hover { text-decoration-thickness: 2px; }
 .nav-menu a { display: block; padding: 10px 12px; border-radius: 8px; color: var(--color-text); text-decoration: none; font-weight: 600; }
 .nav-menu a:hover { background: #eef2ff; }
 
+/* Selectores de edición: listas flotantes con una entrada por juego */
+.ed-menu {
+  position: absolute; z-index: 70; list-style: none; margin: 0; padding: 8px; min-width: 250px;
+  background: #fff; border-radius: 12px; box-shadow: var(--shadow-lg); text-align: left;
+  animation: menu-in 0.18s ease-out;
+}
+.ed-menu[hidden] { display: none; }
+.ed-menu a {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px;
+  color: var(--color-text); text-decoration: none; font-weight: 600; font-size: 0.95rem; white-space: nowrap;
+}
+.ed-menu a:hover { background: #eef2ff; }
+.ed-menu a[aria-current="page"] { font-weight: 800; }
+.ed-menu a[aria-current="page"]::after { content: "✓"; margin-left: auto; color: var(--color-ok); }
+.ed-menu--brand { top: calc(100% + 8px); left: 0; }
+.ed-menu--hero { top: calc(100% + 4px); left: 50%; translate: -50% 0; }
+@keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(0.97); } }
+
 /* Desplegable "Pokédex": elegir el juego */
 .nav-drop { position: relative; }
 .nav-drop-btn {
@@ -150,11 +178,8 @@ a:hover { text-decoration-thickness: 2px; }
 .nav-drop-btn:hover { background: #eef2ff; }
 .nav-drop-caret { font-size: 0.8em; transition: transform 0.2s ease; }
 .nav-drop-btn[aria-expanded="true"] .nav-drop-caret { transform: rotate(180deg); }
-.nav-sub { list-style: none; margin: 0 0 4px; padding: 0 0 0 12px; }
-.nav-sub[hidden] { display: none; }
-.nav-sub a { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap; }
-.nav-sub a[aria-current="page"] { font-weight: 800; }
-.nav-sub a[aria-current="page"]::after { content: "✓"; margin-left: auto; color: var(--color-ok); }
+/* En el menú móvil va integrada en la lista; en escritorio flota (ver breakpoints) */
+.nav-sub { position: static; margin: 0 0 4px; padding: 0 0 0 12px; min-width: 0; box-shadow: none; background: transparent; animation: none; }
 .nav-sub-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; border: 1.5px solid rgb(0 0 0 / 0.25); }
 .nav-sub-dot--frlg { background: linear-gradient(90deg, #d9261c 50%, #189a46 50%); }
 .nav-sub-dot--sv { background: linear-gradient(90deg, #e2401c 50%, #7b3fc4 50%); }
@@ -166,25 +191,48 @@ a:hover { text-decoration-thickness: 2px; }
 .hero-half--leaf { background: linear-gradient(225deg, var(--leaf-hi) 0%, var(--color-leaf) 45%, var(--color-leaf-dark) 100%); }
 .hero-split::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgb(15 23 42 / 0.15), rgb(15 23 42 / 0.55)); }
 .hero-content { position: relative; z-index: 2; text-align: center; padding-block: var(--spacing-2xl); }
-.hero-content a:not(.btn) { color: #ffe98a; }
+.hero-content a:not(.btn, .ed-menu a) { color: #ffe98a; }
 
+/* Botón: se balancea al pasar por encima y al pulsarlo se abre la tapa y sale el selector */
+.ball-picker { position: relative; width: fit-content; margin: 0 auto var(--spacing-md); }
 .pokeball {
-  width: 120px; height: 120px; border-radius: 50%; margin: 0 auto var(--spacing-md);
-  background: linear-gradient(to bottom, #ee1c25 46%, #111 46%, #111 54%, #fff 54%);
-  border: 5px solid #111; position: relative;
+  display: block; width: 120px; height: 120px; border-radius: 50%; padding: 0; margin: 0;
+  /* Dentro: oscuro arriba (se ve al abrir la tapa) y la mitad blanca con la banda */
+  background: linear-gradient(to bottom, #2b1a12 50%, #111 50%, #111 54%, #fff 54%);
+  border: 5px solid #111; position: relative; cursor: pointer;
   box-shadow: var(--shadow-lg), inset -10px -12px 0 rgb(0 0 0 / 0.15);
   animation: float 4s ease-in-out infinite;
-  transition: transform 0.25s ease;
 }
-.pokeball:hover { transform: rotate(-10deg) scale(1.04); }
-.pokeball-shine { position: absolute; left: 18px; top: 14px; width: 26px; height: 14px; border-radius: 50%; background: rgb(255 255 255 / 0.7); transform: rotate(-25deg); }
+.pokeball:hover:not([aria-expanded="true"]) { animation: float 4s ease-in-out infinite, ball-wiggle 0.8s ease-in-out infinite; }
+.pokeball:focus-visible { outline-offset: 6px; border-radius: 50%; }
+.pokeball-lid {
+  position: absolute; top: -5px; left: -5px; right: -5px; height: calc(50% + 5px); z-index: 1;
+  background: linear-gradient(to bottom, #ee1c25 calc(100% - 4px), #111 0);
+  border: 5px solid #111; border-bottom: 0; border-radius: 999px 999px 0 0;
+  box-shadow: inset -10px 6px 0 rgb(0 0 0 / 0.12);
+  transform-origin: 6% 100%; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pokeball[aria-expanded="true"] .pokeball-lid { transform: rotate(-42deg); }
+.pokeball-glow {
+  position: absolute; left: 50%; top: 42%; width: 80%; height: 50%; translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(circle, #fff9c4, #ffe066 40%, transparent 70%);
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.pokeball[aria-expanded="true"] .pokeball-glow { opacity: 1; }
+.pokeball-shine { position: absolute; left: 14px; top: 10px; width: 26px; height: 14px; border-radius: 50%; background: rgb(255 255 255 / 0.7); transform: rotate(-25deg); }
 .pokeball-button {
-  position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; border-radius: 50%;
+  position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; border-radius: 50%; z-index: 2;
   background: #fff; border: 6px solid #111; transform: translate(-50%, -50%);
   box-shadow: 0 0 0 3px #fff;
 }
+.pokeball:hover .pokeball-button { background: #fff7cc; }
 @keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
-@media (prefers-reduced-motion: reduce) { .pokeball { animation: none; } html { scroll-behavior: auto; } }
+@keyframes ball-wiggle { 0%, 100% { rotate: 0deg; } 20% { rotate: -14deg; } 40% { rotate: 10deg; } 60% { rotate: -6deg; } 80% { rotate: 3deg; } }
+@media (prefers-reduced-motion: reduce) {
+  .pokeball, .pokeball:hover:not([aria-expanded="true"]), .brand:hover .brand-ball, .ed-menu { animation: none; }
+  .pokeball-lid { transition: none; }
+  html { scroll-behavior: auto; }
+}
 
 .pokemon-logo { width: min(420px, 78vw); filter: drop-shadow(0 6px 0 rgb(0 0 0 / 0.35)) drop-shadow(0 12px 24px rgb(0 0 0 / 0.35)); }
 .pokemon-logo-fallback {
@@ -651,11 +699,12 @@ a:hover { text-decoration-thickness: 2px; }
   .nav-drop-btn:hover { background: rgb(255 255 255 / 0.12); color: #fff; }
   .nav-menu a.active, .nav-drop-btn.active { background: rgb(255 255 255 / 0.16); color: #fff; }
   .nav-sub {
-    position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; min-width: 250px;
-    background: #fff; border-radius: 12px; box-shadow: var(--shadow-md); padding: 8px; margin: 0;
+    position: absolute; top: calc(100% + 8px); left: 0; min-width: 250px;
+    background: #fff; border-radius: 12px; box-shadow: var(--shadow-lg); padding: 8px; margin: 0;
+    animation: menu-in 0.18s ease-out;
   }
-  .nav-sub a, .nav-sub a:hover { color: var(--color-text); padding: 10px 12px; }
-  .nav-sub a:hover { background: #eef2ff; }
+  .nav-menu .ed-menu a { color: var(--color-text); padding: 10px 12px; }
+  .nav-menu .ed-menu a:hover { background: #eef2ff; color: var(--color-text); }
   .link-grid { grid-template-columns: repeat(2, 1fr); }
   .set-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dex-toolbar { grid-template-columns: 2fr 1fr; align-items: end; }

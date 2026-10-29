@@ -24,25 +24,26 @@
 
   <header class="site-header" id="top">
     <div class="container header-inner">
-      <a class="brand" href="#portada" aria-label="Inicio — Guía de ediciones Pokémon: Escarlata y Púrpura">
-        <span class="brand-ball" aria-hidden="true"><span class="brand-ball-btn"></span></span>
-        <span class="brand-text">Guía de ediciones <strong>Pokémon</strong>
-          <small class="brand-game">Escarlata · Púrpura</small></span>
-      </a>
+      <div class="brand-wrap ed-picker">
+        <button class="brand ed-toggle" type="button" aria-expanded="false" aria-controls="brandMenu"
+          aria-label="Guía de ediciones Pokémon: Escarlata y Púrpura. Cambiar de edición">
+          <span class="brand-ball" aria-hidden="true"><span class="brand-ball-btn"></span></span>
+          <span class="brand-text">Guía de ediciones <strong>Pokémon</strong>
+            <small class="brand-game">Escarlata · Púrpura <span class="nav-drop-caret" aria-hidden="true">▾</span></small></span>
+        </button>
+        <ul class="ed-menu ed-menu--brand" id="brandMenu" data-ed-list="portada" aria-label="Ediciones de la guía" hidden></ul>
+      </div>
       <nav class="site-nav" aria-label="Navegación principal">
         <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Abrir menú">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <ul class="nav-menu" id="navMenu">
           <li><a href="#portada">Portada</a></li>
-          <li class="nav-drop">
-            <button class="nav-drop-btn" id="dexMenuBtn" type="button" aria-expanded="false" aria-controls="dexMenu">
+          <li class="nav-drop ed-picker">
+            <button class="nav-drop-btn ed-toggle" id="dexMenuBtn" type="button" aria-expanded="false" aria-controls="dexMenu">
               Pokédex <span class="nav-drop-caret" aria-hidden="true">▾</span>
             </button>
-            <ul class="nav-sub" id="dexMenu" aria-label="Ediciones de la guía" hidden>
-              <li><a href="index.html#pokedex" data-game="frlg"><span class="nav-sub-dot nav-sub-dot--frlg" aria-hidden="true"></span>Rojo Fuego y Verde Hoja</a></li>
-              <li><a href="escarlata-purpura.html#pokedex" data-game="sv" aria-current="page"><span class="nav-sub-dot nav-sub-dot--sv" aria-hidden="true"></span>Escarlata y Púrpura</a></li>
-            </ul>
+            <ul class="nav-sub ed-menu" id="dexMenu" data-ed-list="pokedex" aria-label="Pokédex de cada edición" hidden></ul>
           </li>
           <li><a href="#mecanicas" data-tab="mecanicas">Mecánicas</a></li>
           <li><a href="#ediciones" data-tab="ediciones">Ediciones</a></li>
@@ -63,10 +64,14 @@
       </div>
 
       <div class="container hero-content">
-        <div class="pokeball" role="img" aria-label="Pokébola clásica roja y blanca">
-          <span class="pokeball-shine" aria-hidden="true"></span>
-          <span class="pokeball-band" aria-hidden="true"></span>
-          <span class="pokeball-button" aria-hidden="true"></span>
+        <div class="ball-picker ed-picker">
+          <button class="pokeball ed-toggle" type="button" aria-expanded="false" aria-controls="heroMenu"
+            aria-label="Abrir la Pokéball para elegir edición" title="Pulsa para elegir edición">
+            <span class="pokeball-glow" aria-hidden="true"></span>
+            <span class="pokeball-lid" aria-hidden="true"><span class="pokeball-shine"></span></span>
+            <span class="pokeball-button" aria-hidden="true"></span>
+          </button>
+          <ul class="ed-menu ed-menu--hero" id="heroMenu" data-ed-list="portada" aria-label="Ediciones de la guía" hidden></ul>
         </div>
 
         <img
