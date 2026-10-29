@@ -1,6 +1,6 @@
 /* App principal: pestañas, ediciones, modal y guía en vídeo.
-   Script clásico: usa los globales de data.js, api.js, ui.js y playlist.js
-   (cargados antes, en ese orden, al final de index.html). */
+   Script clásico: usa los globales de games.js, los datos y la playlist del juego,
+   api.js y ui.js (cargados antes, al final de cada página). */
 
 const $ = (s, r = document) => r.querySelector(s);
 const gridFire = $("#grid-fire");
@@ -12,6 +12,11 @@ const statusLeaf = document.querySelector('[data-panel-status="leaf"]');
 const modalBackdrop = $("#modalBackdrop");
 const modalBody = $("#modalBody");
 const modalClose = $("#modalClose");
+
+const ALL_EXCLUSIVES = [
+  ...EXCL_FIRE.map((p) => ({ ...p, edition: "fire" })),
+  ...EXCL_LEAF.map((p) => ({ ...p, edition: "leaf" })),
+];
 
 let store = []; // lista enriquecida con datos vivos
 let lastFocus = null;
@@ -25,7 +30,6 @@ init();
 async function init() {
   // Cada subsistema va protegido: si uno falla, el resto sigue funcionando.
   safe("images", initImageFallbacks);
-  safe("copy", initCopyLink);
   safe("nav", initNav);
   safe("tabs", initTabs);
   safe("dex", initPokedex);
@@ -87,24 +91,6 @@ function initImageFallbacks() {
   });
 }
 
-/* Botón "Copiar enlace" del banner superior. */
-function initCopyLink() {
-  const btn = $("#copyLiveUrl");
-  if (!btn) return;
-  const url = $("#liveUrl").href;
-  const done = (msg) => {
-    btn.textContent = msg;
-    setTimeout(() => { btn.textContent = "Copiar enlace"; }, 2000);
-  };
-  btn.addEventListener("click", () => {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(() => done("¡Copiado! ✓"), () => done(url));
-    } else {
-      done(url);
-    }
-  });
-}
-
 /* ---------- Navegación móvil ---------- */
 
 function initNav() {
@@ -119,8 +105,34 @@ function initNav() {
     if (e.target.closest("a")) {
       menu.classList.remove("open");
       btn.setAttribute("aria-expanded", "false");
+      setDexMenu(false);
     }
   });
+  // Desplegable "Pokédex": una entrada por juego de la guía.
+  const dexBtn = $("#dexMenuBtn");
+  dexBtn.addEventListener("click", () => setDexMenu(dexBtn.getAttribute("aria-expanded") !== "true"));
+  // La entrada del juego actual no recarga la página: solo abre la pestaña.
+  $("#dexMenu").addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-game]");
+    if (!a || a.dataset.game !== GAME.id) return;
+    e.preventDefault();
+    setDexMenu(false);
+    activateTab("pokedex");
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".nav-drop")) setDexMenu(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && dexBtn.getAttribute("aria-expanded") === "true") {
+      setDexMenu(false);
+      dexBtn.focus();
+    }
+  });
+}
+
+function setDexMenu(open) {
+  $("#dexMenuBtn").setAttribute("aria-expanded", String(open));
+  $("#dexMenu").hidden = !open;
 }
 
 /* ---------- Pestañas independientes (ver const TABS arriba) ---------- */
@@ -149,6 +161,11 @@ function initTabs() {
   // Enlace profundo: #ediciones, #mapa... (por defecto, pokedex)
   const fromHash = location.hash.replace("#", "");
   activateTab(TABS.includes(fromHash) ? fromHash : "pokedex", { scroll: false });
+  // El desplegable de la Pokédex enlaza a "#pokedex" también dentro de la misma página.
+  window.addEventListener("hashchange", () => {
+    const name = location.hash.replace("#", "");
+    if (TABS.includes(name)) activateTab(name);
+  });
 }
 
 function activateTab(name, opts = {}) {
@@ -164,6 +181,7 @@ function activateTab(name, opts = {}) {
   }
   document.querySelectorAll('.site-nav a[data-tab]').forEach((a) =>
     a.classList.toggle("active", a.dataset.tab === name));
+  $("#dexMenuBtn")?.classList.toggle("active", name === "pokedex");
   try { history.replaceState(null, "", `#${name}`); } catch { /* file:// u otros contextos */ }
   if (opts.scroll === false) return;
   const target = opts.scrollTarget ? document.querySelector(opts.scrollTarget)
@@ -201,7 +219,8 @@ function playVideo(id, title) {
   $("#ytPlayer").src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`;
   $("#nowPlaying").textContent = `${n} · ${title}`;
   const watch = $("#watchLink");
-  if (watch) watch.href = `https://www.youtube.com/watch?v=${id}&list=${PLAYLIST_ID}`;
+  const list = SHORTS.some((v) => v.id === id) ? SHORTS_PLAYLIST_ID : PLAYLIST_ID;
+  if (watch) watch.href = `https://www.youtube.com/watch?v=${id}&list=${list}`;
   markActive(id);
 }
 
@@ -266,8 +285,8 @@ function updateCaughtCounts() {
   const caught = getCaught();
   const dexCount = $("#dexCount");
   if (dexCount) {
-    const total = (typeof DEX_ALL !== "undefined" ? DEX_ALL.length : 251);
-    // Con filtro activo muestra "visibles de total · X capturados" (también 0 de 251).
+    const total = (typeof DEX_ALL !== "undefined" ? DEX_ALL.length : 0);
+    // Con filtro activo muestra "visibles de total · X capturados" (también 0 de N).
     const visible = typeof DEX_ALL !== "undefined" ? dexFiltered().length : total;
     dexCount.textContent = `${visible} de ${total} · ${caught.size} capturados`;
   }
@@ -276,8 +295,8 @@ function updateCaughtCounts() {
     const leaf = store.filter((p) => p.edition === "leaf");
     const fGot = fire.filter((p) => caught.has(p.id)).length;
     const lGot = leaf.filter((p) => caught.has(p.id)).length;
-    if (statusFire) statusFire.textContent = `${fire.length} de ${FIRE_RED.length} en Rojo Fuego · ${fGot} capturados`;
-    if (statusLeaf) statusLeaf.textContent = `${leaf.length} de ${LEAF_GREEN.length} en Verde Hoja · ${lGot} capturados`;
+    if (statusFire) statusFire.textContent = `${fire.length} de ${EXCL_FIRE.length} en ${editionName("fire")} · ${fGot} capturados`;
+    if (statusLeaf) statusLeaf.textContent = `${leaf.length} de ${EXCL_LEAF.length} en ${editionName("leaf")} · ${lGot} capturados`;
   }
 }
 
@@ -312,19 +331,20 @@ async function onGridClick(e) {
 }
 
 function nameOf(id) {
-  return store.find((p) => p.id === id)?.name || String(id);
+  const p = store.find((x) => x.id === id) || DEX_ALL.find((x) => x.id === id);
+  return p ? displayName(p.slug || p.name) : String(id);
 }
 
 function paintSkeletons() {
   skeletonGrid(gridFire, 6);
   skeletonGrid(gridLeaf, 6);
-  stripFire.textContent = "Cargando recortes…";
-  stripLeaf.textContent = "Cargando recortes…";
+  stripFire.textContent = "Cargando…";
+  stripLeaf.textContent = "Cargando…";
   statusFire.textContent = "Cargando Pokémon desde PokéAPI…";
   statusLeaf.textContent = "Cargando Pokémon desde PokéAPI…";
 }
 
-/* Render directo: los 45 exclusivos en sus dos cuadros, mismo formato ball que la Pokédex. */
+/* Render directo: los exclusivos en sus dos cuadros, mismo formato ball que la Pokédex. */
 function renderEditions() {
   if (!store.length) return;
   const caught = getCaught();
@@ -346,7 +366,7 @@ function renderEditions() {
 let selectedDexId = null;
 const edMap = new Map(ALL_EXCLUSIVES.map((p) => [p.id, p.edition]));
 
-/* Entrada unificada 1-251: tipos estáticos, edición si es exclusivo. */
+/* Entrada unificada de la Pokédex: tipos estáticos, edición si es exclusivo. */
 function dexEntry(id) {
   const base = store.find((x) => x.id === id);
   const d = (typeof DEX_ALL !== "undefined" && DEX_ALL.find((x) => x.id === id)) || null;
@@ -355,9 +375,12 @@ function dexEntry(id) {
     id,
     slug,
     name: slug,
+    region: d && d.region,
+    form: (d && d.form) || (base && base.form) || null,
+    art: (d && d.art) || (base && base.art) || null,
     types: (base && base.types) || (typeof TYPES_ALL !== "undefined" && TYPES_ALL[id]) || [],
     edition: edMap.get(id) || (base && base.edition) || null,
-    frlg: base && base.frlg,
+    moves: base && base.moves,
     stats: (base && base.stats) || null,
   };
 }
@@ -386,8 +409,7 @@ function dexFiltered() {
   const q = ($("#dexQ").value || "").trim().toLowerCase();
   const gen = $("#dexGen").value;
   return DEX_ALL.filter((d) => {
-    if (gen === "kanto" && d.id > 151) return false;
-    if (gen === "johto" && d.id < 152) return false;
+    if (gen !== "all" && !(d.regions || [d.region || GAME.regionOf(d.id)]).includes(gen)) return false;
     if (!q) return true;
     const num = String(d.id) === q.replace(/^0+/, "") || `#${String(d.id).padStart(3, "0")}`.includes(q);
     return num || d.slug.includes(q) || displayName(d.slug).toLowerCase().includes(q);
@@ -411,7 +433,8 @@ function renderDexList() {
 async function dexLocSection(p, evo) {
   const loc = LOC[p.id];
   if (loc && (loc.w.length || loc.e)) {
-    const src = p.id > 151
+    // En RFVH, Johto no viene de RankedBoost (ver data.js): se enlaza la Pokédex oficial.
+    const src = GAME.id === "frlg" && p.id > 151
       ? { url: `https://www.pokemon.com/es/pokedex/${p.slug}`, label: `Pokédex oficial · ${displayName(p.slug)}` }
       : null;
     return locationsHTML(p, src);
@@ -437,7 +460,7 @@ async function dexLocSection(p, evo) {
       return dexObtainHTML("Encuentro especial o evento (no aparece de forma normal en estado salvaje).", p.slug);
     }
   } catch { /* sigue al genérico */ }
-  return dexObtainHTML("No aparece salvaje en Rojo Fuego / Verde Hoja · se consigue por intercambio desde otros juegos.", p.slug);
+  return dexObtainHTML(GAME.noWildText, p.slug);
 }
 
 async function selectDex(id, opts = {}) {
@@ -452,18 +475,18 @@ async function selectDex(id, opts = {}) {
   const p = dexEntry(id);
   detail.innerHTML = dexLoadingHTML(displayName(p.slug));
   try {
-    // Una sola llamada viva: da estadísticas (para la naturaleza) y movimientos FRLG.
-    const live = await fetchPokemon(id).catch(() => null);
+    // Una sola llamada viva: da estadísticas (para la naturaleza) y movimientos del juego.
+    const live = await fetchPokemon(p.form || id).catch(() => null);
     if (!p.stats && live) p.stats = live.stats;
-    const frlg = (live && live.frlg) || p.frlg ||
-      (await fetchFrlgMoves(id).catch(() => null)) || { level: [], machine: [], tutor: [] };
-    const slugs = [...frlg.level.map((m) => m.slug), ...frlg.machine, ...frlg.tutor];
+    const learn = (live && live.moves) || p.moves ||
+      (await fetchGameMoves(p.form || id).catch(() => null)) || { level: [], machine: [], tutor: [] };
+    const slugs = [...learn.level.map((m) => m.slug), ...learn.machine, ...learn.tutor];
     const infos = await Promise.all(slugs.map((s) => fetchMoveDetail(s).catch(() => null)));
     const bySlug = new Map(infos.filter(Boolean).map((i) => [i.slug, i]));
     const moves = {
-      level: frlg.level.map((m) => ({ ...m, info: bySlug.get(m.slug) || null })),
-      machine: frlg.machine.map((s) => ({ slug: s, info: bySlug.get(s) || null })),
-      tutor: frlg.tutor.map((s) => ({ slug: s, info: bySlug.get(s) || null })),
+      level: learn.level.map((m) => ({ ...m, info: bySlug.get(m.slug) || null })),
+      machine: learn.machine.map((s) => ({ slug: s, info: bySlug.get(s) || null })),
+      tutor: learn.tutor.map((s) => ({ slug: s, info: bySlug.get(s) || null })),
     };
     const evo = await fetchEvoChain(id).catch(() => null);
     const loc = await dexLocSection(p, evo);
@@ -516,8 +539,8 @@ async function openModal(id) {
   try {
     let p = store.find((x) => x.id === id);
     if (!p?.stats) {
-      const live = await fetchPokemon(id);
-      p = { ...p, ...live };
+      const live = await fetchPokemon((p && p.form) || id);
+      p = { ...p, ...live, id };
     }
     if (req !== modalRequest || modalBackdrop.hidden) return;
     modalBody.innerHTML = modalHTML(p, p.edition);

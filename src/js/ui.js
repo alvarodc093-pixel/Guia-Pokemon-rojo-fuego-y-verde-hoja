@@ -1,5 +1,5 @@
 /* UI: render de tarjetas, modal, toast, capturados y Pokédex.
-   Script clásico: usa los globales de data.js y api.js (ver orden en index.html). */
+   Script clásico: usa los globales de games.js, los datos del juego y api.js (ver orden en la página). */
 
 function cap(name = "") {
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -26,9 +26,14 @@ function ballInnerHTML() {
     <span class="ball-flash" aria-hidden="true"></span>`;
 }
 
+/* Arte oficial: las formas regionales (Vulpix de Alola...) tienen su propio nº en PokéAPI. */
+function artOf(p) {
+  return artworkUrl(p.art || p.id);
+}
+
 function cardHTML(p, isCaught) {
-  const img = p.sprite || artworkUrl(p.id);
-  const name = cap(p.name || p.slug);
+  const img = p.sprite || artOf(p);
+  const name = displayName(p.slug || p.name);
   const caught = !!isCaught;
   return `
     <li>
@@ -36,7 +41,7 @@ function cardHTML(p, isCaught) {
         <div class="poke-media">
           <img src="${img}" alt="Arte oficial de ${name}" width="80" height="80"
                loading="lazy" decoding="async"
-               data-fallback="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png" />
+               data-fallback="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.art || p.id}.png" />
           <button class="poke-ball${caught ? " is-caught" : ""}" data-caught="${p.id}"
             aria-pressed="${caught ? "true" : "false"}"
             aria-label="Marcar a ${name} como capturado"
@@ -44,7 +49,7 @@ function cardHTML(p, isCaught) {
           ${caught ? `<span class="caught-ribbon">✓ Capturado</span>` : ""}
         </div>
         <div class="poke-body">
-          <span class="poke-dex">${dex(p.id)} · ${p.edition === "fire" ? "Rojo Fuego" : "Verde Hoja"}</span>
+          <span class="poke-dex">${dex(p.id)} · ${editionName(p.edition)}</span>
           <h3 class="poke-name">${name}</h3>
           <div class="poke-types">${typeChips(p.types)}</div>
           <div class="poke-actions">
@@ -65,7 +70,8 @@ function toast(msg) {
 }
 
 function modalHTML(p, edition) {
-  const img = p.sprite || artworkUrl(p.id);
+  const img = p.sprite || artOf(p);
+  const name = displayName(p.slug || p.name);
   const caught = getCaught().has(p.id);
   const stats = (p.stats || [])
     .map(
@@ -79,10 +85,10 @@ function modalHTML(p, edition) {
     .join("");
   return `
     <div class="modal-top">
-      <img src="${img}" alt="Arte oficial de ${cap(p.name)}" width="130" height="130" />
+      <img src="${img}" alt="Arte oficial de ${name}" width="130" height="130" />
       <div>
-        <p class="poke-dex" style="margin:0">${dex(p.id)} · ${edition === "fire" ? "🔥 Rojo Fuego (exclusivo)" : "🍃 Verde Hoja (exclusivo)"}</p>
-        <h2 id="modalName" style="margin:2px 0 6px; text-transform:capitalize">${cap(p.name)}</h2>
+        <p class="poke-dex" style="margin:0">${dex(p.id)} · ${editionName(edition, { icon: true })} (exclusivo)</p>
+        <h2 id="modalName" style="margin:2px 0 6px">${name}</h2>
         <div class="poke-types">${typeChips(p.types)}</div>
       </div>
     </div>
@@ -97,13 +103,13 @@ function modalHTML(p, edition) {
     <h3 style="margin:12px 0 6px">Estadísticas base</h3>
     ${stats || "<p>Sin datos de estadísticas.</p>"}
     <div class="modal-actions">
-      <a class="btn btn--dark" target="_blank" rel="noopener" href="https://www.pokemon.com/es/pokedex/${p.name}">Ficha en Pokémon.com</a>
+      <a class="btn btn--dark" target="_blank" rel="noopener" href="https://www.pokemon.com/es/pokedex/${p.slug || p.name}">Ficha en Pokémon.com</a>
       <button class="btn btn--subtle catch-btn" data-action="caught" data-id="${p.id}"
         aria-pressed="${caught ? "true" : "false"}"><span class="mini-ball" aria-hidden="true"></span>${caught ? "¡Capturado! ✓" : "Marcar capturado"}</button>
     </div>`;
 }
 
-/* Recorte local de la tabla japonesa aportada por el usuario.
+/* Recorte local de la tabla japonesa de exclusivos (solo Rojo Fuego / Verde Hoja).
    Mitad superior -> fire (22), mitad inferior -> leaf (23). */
 function cutoutUrl(edition, id, slug) {
   return `src/assets/cutouts/${edition}/${String(id).padStart(3, "0")}-${slug}.png`;
@@ -114,12 +120,12 @@ function stripHTML(list, activeIds) {
   return list
     .map((p) => {
       const dim = activeIds.has(p.id) ? "" : " is-dim";
-      const label = `${cap(p.name || p.slug)} ${dex(p.id)}`;
+      const label = `${displayName(p.slug || p.name)} ${dex(p.id)}`;
+      const src = GAME.cutouts ? cutoutUrl(p.edition, p.id, p.slug) : artOf(p);
       return `<button class="cutout-btn${dim}" data-action="detail" data-id="${p.id}"
         aria-label="Ver ficha de ${label}" title="${label}">
-        <img src="${cutoutUrl(p.edition, p.id, p.slug)}" alt="${label}, recorte de la guía"
-             width="54" height="54" loading="lazy" decoding="async"
-             data-fallback="${artworkUrl(p.id)}" />
+        <img src="${src}" alt="${label}" width="54" height="54" loading="lazy" decoding="async"
+             data-fallback="${artOf(p)}" />
       </button>`;
     })
     .join("");
@@ -133,14 +139,14 @@ function displayName(slug = "") {
 
 /* ---------- Pokédex: lista + ficha completa ---------- */
 
-/* Capturados (tracker del usuario, persistente en este navegador). */
-const CAUGHT_KEY = "frlg:caught:v1";
+/* Capturados (tracker del usuario, persistente en este navegador y separado por juego). */
+const CAUGHT_KEY = GAME.caughtKey;
 
 function getCaught() {
   try {
     // Solo números válidos: el valor guardado puede venir editado o corrupto.
     const saved = JSON.parse(localStorage.getItem(CAUGHT_KEY) || "[]");
-    return new Set((Array.isArray(saved) ? saved : []).map(Number).filter((n) => Number.isInteger(n) && n > 0 && n <= 386));
+    return new Set((Array.isArray(saved) ? saved : []).map(Number).filter((n) => Number.isInteger(n) && n > 0 && n <= GAME.maxId));
   } catch {
     return new Set();
   }
@@ -164,11 +170,11 @@ function dexListHTML(list, selectedId, caught) {
     .map((p) => {
       const cur = p.id === selectedId;
       const got = done.has(p.id);
-      const ed = p.edition === "fire" ? "🔥" : p.edition === "leaf" ? "🍃" : "";
+      const ed = p.edition ? GAME.editions[p.edition].icon : "";
       const name = displayName(p.slug);
       return `<li class="dex-cell${got ? " is-caught" : ""}"><button class="dex-card${cur ? " is-current" : ""}" data-dex="${p.id}"
         ${cur ? 'aria-current="true"' : ""} aria-label="Ver ficha de ${name}${got ? " (capturado)" : ""}">
-        <img src="${artworkUrl(p.id)}" alt="" loading="lazy" decoding="async" width="88" height="88" />
+        <img src="${artOf(p)}" alt="" loading="lazy" decoding="async" width="88" height="88" />
         <span class="dex-card-num">${dex(p.id)}</span>
         <span class="dex-card-name">${name}${ed ? ` <span class="dex-item-ed">${ed}</span>` : ""}</span>
         <span class="dex-card-types">${typeChips(p.types)}</span>
@@ -188,12 +194,10 @@ function dexErrorHTML() {
 
 /* Ficha completa: imagen, tipos, ubicación+%, evoluciones y ataques. */
 function dexDetailHTML(p, evoTree, moves, locSection) {
-  const region = p.id <= 151 ? "Kanto" : "Johto";
-  const edLabel = p.edition === "fire" ? "🔥 Rojo Fuego (exclusivo)"
-    : p.edition === "leaf" ? "🍃 Verde Hoja (exclusivo)" : region;
+  const edLabel = p.edition ? `${editionName(p.edition, { icon: true })} (exclusivo)` : regionName(p);
   return `
     <header class="dex-head">
-      <img src="${artworkUrl(p.id)}" alt="Arte oficial de ${displayName(p.slug)}" width="140" height="140" />
+      <img src="${artOf(p)}" alt="Arte oficial de ${displayName(p.slug)}" width="140" height="140" />
       <div>
         <p class="poke-dex" style="margin:0">${dex(p.id)} · ${edLabel}</p>
         <h3 class="dex-name">${displayName(p.slug)}</h3>
@@ -207,7 +211,7 @@ function dexDetailHTML(p, evoTree, moves, locSection) {
     ${evoTree ? evoChainHTML(evoTree, p.id) : `<p>Sin datos de evolución.</p>`}
     <h3 class="dex-sub">Ataques por nivel</h3>
     ${movesLevelHTML(moves.level)}
-    <h3 class="dex-sub">Por MT / MO</h3>
+    <h3 class="dex-sub">Por ${GAME.machines.replace("/", " / ")}</h3>
     ${movesMachineHTML(moves.machine)}
     ${moves.tutor && moves.tutor.length ? `<h3 class="dex-sub">Por tutor</h3>${movesTutorHTML(moves.tutor)}` : ""}`;
 }
@@ -250,10 +254,10 @@ function movesLevelHTML(items) {
 }
 
 function movesMachineHTML(items) {
-  if (!items || !items.length) return `<p>No aprende ninguna MT/MO.</p>`;
+  if (!items || !items.length) return `<p>No aprende ninguna ${GAME.machines}.</p>`;
   return `<div class="table-wrap"><table class="moves-table">
-    <caption class="sr-only">Ataques por MT o MO</caption>
-    <thead><tr><th scope="col">MT/MO</th><th scope="col">Movimiento</th><th scope="col">Tipo</th><th scope="col">Pot.</th><th scope="col">Prec.</th></tr></thead>
+    <caption class="sr-only">Ataques por ${GAME.machines.replace("/", " o ")}</caption>
+    <thead><tr><th scope="col">${GAME.machines}</th><th scope="col">Movimiento</th><th scope="col">Tipo</th><th scope="col">Pot.</th><th scope="col">Prec.</th></tr></thead>
     <tbody>${items.map((m) =>
       `<tr><td><span class="mt-badge">${m.info && m.info.mt ? m.info.mt : "MT"}</span></td><td>${m.info ? m.info.nameEs : m.slug}</td>${moveCells(m.info)}</tr>`
     ).join("")}</tbody></table></div>`;
@@ -264,16 +268,16 @@ function movesTutorHTML(items) {
     `<li>${m.info ? m.info.nameEs : m.slug}</li>`).join("")}</ul>`;
 }
 
-/* Dónde capturarlo según RankedBoost FRLG, con enlace a su ficha.
+/* Dónde capturarlo según RankedBoost (datos del juego actual), con enlace a su ficha.
    src opcional {url, label} para orígenes distintos (p. ej. legendarios). */
 function locationsHTML(p, src) {
   const loc = LOC[p.id];
   const slug = p.slug || p.name || "";
   const name = displayName(slug);
-  const link = src || {
-    url: `https://rankedboost.com/pokemon/${slug}/firered-leafgreen/`,
-    label: `RankedBoost · ficha de ${name} en FRLG`,
-  };
+  // Sin datos de RankedBoost, en Escarlata/Púrpura su ficha suele no existir: mejor Serebii.
+  const link = src || (!loc && GAME.serebii
+    ? { url: GAME.serebii(slug), label: `Serebii · ficha de ${name}` }
+    : { url: GAME.rankedBoost(slug), label: `RankedBoost · ficha de ${name} en ${GAME.rankedBoostLabel}` });
   let inner = "";
   if (loc?.w?.length) {
     inner += `<ul class="loc-list">${loc.w
@@ -296,12 +300,15 @@ function locationsHTML(p, src) {
 
 /* Ubicaciones salvajes fuera de RankedBoost (encuentros de PokéAPI). */
 function dexSourceHTML(slug) {
-  return `<p class="loc-source">Fuente: <a href="https://www.pokemon.com/es/pokedex/${slug}" target="_blank" rel="noopener">Pokédex oficial</a> · Encuentros: PokéAPI</p>`;
+  const more = GAME.serebii
+    ? ` · <a href="${GAME.serebii(slug)}" target="_blank" rel="noopener">Ficha en Serebii</a>`
+    : " · Encuentros: PokéAPI";
+  return `<p class="loc-source">Fuente: <a href="https://www.pokemon.com/es/pokedex/${slug}" target="_blank" rel="noopener">Pokédex oficial</a>${more}</p>`;
 }
 
 function dexWildHTML(areas, slug) {
   const items = areas.map((a) => {
-    const ed = a.eds.length === 1 ? (a.eds[0] === "fire" ? " 🔥" : " 🍃") : "";
+    const ed = a.eds.length === 1 ? ` ${GAME.editions[a.eds[0]].icon}` : "";
     return `<li><strong>${a.area}</strong> · ${a.method} · ${a.levels} <span class="loc-rate" title="Probabilidad de aparición">${a.rate}</span>${ed}</li>`;
   }).join("");
   return `<h3 style="margin:12px 0 6px">Dónde capturarlo 📍</h3><ul class="loc-list">${items}</ul>${dexSourceHTML(slug)}`;

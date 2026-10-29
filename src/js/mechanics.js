@@ -1,5 +1,5 @@
 /* Mecánicas: naturalezas (25) + tipos y eficacias (18).
-   Script clásico: se carga tras data.js (usa TYPE_ES) y antes de app.js.
+   Script clásico: se carga tras games.js (usa GAME y TYPE_ES) y antes de app.js.
    Expone: NATURES, pickNatures, natureCardsHTML, pickMoveset, movesetHTML, initMechanics. */
 
 const STAT_ES = {
@@ -272,9 +272,11 @@ function natureCardsGridHTML() {
 
 /* ---------- Set de ataques recomendado (ficha de la Pokédex) ---------- */
 
-/* En la 3.ª generación la categoría la decide el tipo, no el movimiento. */
+/* En la 3.ª generación la categoría la decide el tipo, no el movimiento;
+   desde la 4.ª cada ataque tiene la suya (PokéAPI la da en damage_class). */
 const PHYSICAL_TYPES = new Set(["normal", "fighting", "flying", "poison", "ground", "rock", "bug", "ghost", "steel"]);
 const GEN3_TYPES = TYPE_ORDER.filter((t) => t !== "fairy");
+const GAME_TYPES = GAME.gen === 3 ? GEN3_TYPES : TYPE_ORDER;
 
 /* Daño variable con un valor de referencia razonable (Retribución con amistad máxima). */
 const MOVE_POWER_FIX = { return: 102, magnitude: 71 };
@@ -289,12 +291,27 @@ const MOVE_PENALTY = {
   "double-edge": 0.85, "take-down": 0.85, submission: 0.85, "volt-tackle": 0.85,
   thrash: 0.85, "petal-dance": 0.85, outrage: 0.85, uproar: 0.85,
   overheat: 0.6, "psycho-boost": 0.6, superpower: 0.8,
+  // Generaciones posteriores
+  "giga-impact": 0.5, "roar-of-time": 0.5, "prismatic-laser": 0.5, "meteor-beam": 0.7,
+  "draco-meteor": 0.6, "leaf-storm": 0.6, "fleur-cannon": 0.6, "make-it-rain": 0.85,
+  "close-combat": 0.85, "head-smash": 0.75, "brave-bird": 0.85, "flare-blitz": 0.85,
+  "wood-hammer": 0.85, "wild-charge": 0.9, "head-charge": 0.9, "wave-crash": 0.85,
+  "hammer-arm": 0.9, "ice-hammer": 0.9, "steel-beam": 0.6, "mind-blown": 0.6,
+  "armor-cannon": 0.85, "headlong-rush": 0.85, "raging-fury": 0.85,
+  "phantom-force": 0.8, "shadow-force": 0.8, "sky-drop": 0.6, "freeze-shock": 0.5,
+  "ice-burn": 0.5, "geomancy": 0.5, "gigaton-hammer": 0.8, "last-respects": 0.6,
 };
 /* Sin sitio en un set: se debilitan, dependen del rival o del estado, o son para capturar. */
 const MOVE_EXCLUDED = new Set([
   "explosion", "self-destruct", "dream-eater", "snore", "false-swipe", "hidden-power",
   "sonic-boom", "dragon-rage", "super-fang", "psywave", "present", "bide", "counter", "mirror-coat",
   "endeavor", "flail", "reversal", "spit-up", "low-kick", "struggle",
+  // Generaciones posteriores: dependen del rival, del peso, de los PS o de otro aliado
+  "final-gambit", "memento", "misty-explosion", "grass-knot", "heavy-slam", "heat-crash",
+  "gyro-ball", "electro-ball", "foul-play", "metal-burst", "comeuppance", "natural-gift",
+  "fling", "belch", "last-resort", "ruination", "nature-power", "stored-power",
+  "power-trip", "punishment", "trump-card", "wring-out", "crush-grip", "rage-fist",
+  "first-impression", "synchronoise", "steel-roller", "shell-trap",
 ]);
 /* Mejoras de stats: ocupan el 4.º hueco si el último ataque apenas suma. kind = ataques que potencian. */
 const BOOST_PICKS = [
@@ -302,6 +319,13 @@ const BOOST_PICKS = [
   { slug: "swords-dance", kind: "physical", why: "Duplica el Ataque de sus golpes físicos." },
   { slug: "bulk-up", kind: "physical", why: "Sube Ataque y Defensa." },
   { slug: "calm-mind", kind: "special", why: "Sube At. Esp. y Def. Esp." },
+  // Generaciones posteriores (no existen en RFVH, así que allí nunca se eligen)
+  { slug: "shell-smash", kind: "physical", why: "Duplica Ataque, At. Esp. y Velocidad a cambio de sus defensas." },
+  { slug: "quiver-dance", kind: "special", why: "Sube At. Esp., Def. Esp. y Velocidad." },
+  { slug: "nasty-plot", kind: "special", why: "Duplica el At. Esp. de sus ataques especiales." },
+  { slug: "shift-gear", kind: "physical", why: "Sube Ataque y duplica la Velocidad." },
+  { slug: "victory-dance", kind: "physical", why: "Sube Ataque, Defensa y Velocidad." },
+  { slug: "tidy-up", kind: "physical", why: "Sube Ataque y Velocidad y limpia trampas." },
 ];
 /* Apoyo solo para huecos que no llena ningún ataque útil, en orden de preferencia.
    last: únicamente si no aprende ningún ataque (Wobbuffet y similares). */
@@ -311,6 +335,10 @@ const SUPPORT_PICKS = [
   { slug: "softboiled", why: "Recupera la mitad de los PS." },
   { slug: "milk-drink", why: "Recupera la mitad de los PS." },
   { slug: "recover", why: "Recupera la mitad de los PS." },
+  { slug: "roost", why: "Recupera la mitad de los PS." },
+  { slug: "slack-off", why: "Recupera la mitad de los PS." },
+  { slug: "shore-up", why: "Recupera la mitad de los PS." },
+  { slug: "stealth-rock", why: "Trampa de rocas: daña a cada rival que entre al combate." },
   { slug: "thunder-wave", why: "Paraliza: el rival pierde velocidad y a veces el turno." },
   { slug: "will-o-wisp", why: "Quema: el rival pierde vida y la mitad de su Ataque." },
   { slug: "leech-seed", why: "Roba vida cada turno." },
@@ -327,9 +355,10 @@ const SUPPORT_PICKS = [
 ];
 const SLEEP_MOVES = new Set(["spore", "sleep-powder", "hypnosis"]);
 
-/* Eficacia en la 3.ª generación: sin tipo Hada y Acero resiste Fantasma y Siniestro. */
-function gen3Eff(atk, def) {
-  if (def === "steel" && (atk === "ghost" || atk === "dark")) return 0.5;
+/* Eficacia en la generación del juego. En la 3.ª no hay tipo Hada y Acero resiste
+   Fantasma y Siniestro; desde la 6.ª vale TYPE_CHART tal cual. */
+function gameEff(atk, def) {
+  if (GAME.gen === 3 && def === "steel" && (atk === "ghost" || atk === "dark")) return 0.5;
   const row = TYPE_CHART[atk];
   if (!row) return 1;
   if (row.x2.includes(def)) return 2;
@@ -348,16 +377,16 @@ function attackCandidate(m, s, types) {
   }
   const power = MOVE_POWER_FIX[m.slug] || info.power;
   if (!power) return null;
-  const physical = PHYSICAL_TYPES.has(info.type);
+  const physical = GAME.gen === 3 ? PHYSICAL_TYPES.has(info.type) : info.physical;
   const stat = (physical ? s.attack : s["special-attack"]) || 100;
   const stab = types.includes(info.type);
   const score = power * (info.hits || 1) * acc * (stab ? 1.5 : 1) * stat * (MOVE_PENALTY[m.slug] || 1);
-  return { ...m, physical, stab, key: info.type, score, eff: (d) => gen3Eff(info.type, d) };
+  return { ...m, physical, stab, key: info.type, score, eff: (d) => gameEff(info.type, d) };
 }
 
 /* Daño del set: contra cada tipo defensor cuenta el mejor de sus ataques. */
 function setValue(set) {
-  return GEN3_TYPES.reduce((sum, d) => sum + Math.max(0, ...set.map((c) => c.score * c.eff(d))), 0);
+  return GAME_TYPES.reduce((sum, d) => sum + Math.max(0, ...set.map((c) => c.score * c.eff(d))), 0);
 }
 
 /* Elige hasta 4 ataques de forma voraz (potencia + cobertura) y completa con apoyo.
@@ -413,8 +442,8 @@ function pickMoveset(stats, types, moves) {
     add(all.get(p.slug), p.why);
   }
 
-  const covered = GEN3_TYPES.filter((d) => set.some((c) => !c.fixed && c.eff(d) >= 2));
-  const walls = GEN3_TYPES.filter((d) => set.length && set.every((c) => c.eff(d) < 1));
+  const covered = GAME_TYPES.filter((d) => set.some((c) => !c.fixed && c.eff(d) >= 2));
+  const walls = GAME_TYPES.filter((d) => set.length && set.every((c) => c.eff(d) < 1));
   return { s, set, support, covered, walls };
 }
 
@@ -431,7 +460,7 @@ function movesetRoleText(s, set) {
 
 function movesetWhy(c) {
   if (c.fixed) return "Quita tantos PS como su nivel, sin importar sus stats ni los del rival.";
-  const se = GEN3_TYPES.filter((d) => c.eff(d) >= 2);
+  const se = GAME_TYPES.filter((d) => c.eff(d) >= 2);
   const parts = [];
   if (c.stab) parts.push("STAB (+50 % por ser de su tipo)");
   if (se.length) parts.push(`muy eficaz contra ${se.map(typeNameEs).join(", ")}`);
@@ -444,7 +473,7 @@ function movesetHTML(p, moves) {
   const title = `<h3 class="dex-sub">Set recomendado ⚔️</h3>`;
   const pick = pickMoveset(p.stats, p.types || [], moves);
   if (!pick.set.length && !pick.support.length) {
-    return `${title}<p>No aprende ataques que valga la pena recomendar en Rojo Fuego / Verde Hoja.</p>`;
+    return `${title}<p>No aprende ataques que valga la pena recomendar en ${GAME.title}.</p>`;
   }
   const card = (m, why, extra = "") => {
     const info = m.info;
@@ -461,15 +490,17 @@ function movesetHTML(p, moves) {
     ...pick.support.map((m) => card(m, m.why, " set-card--support")),
   ].join("");
   const cover = pick.set.length
-    ? `<p class="loc-source"><strong>Muy eficaz contra ${pick.covered.length} de ${GEN3_TYPES.length} tipos.</strong>
+    ? `<p class="loc-source"><strong>Muy eficaz contra ${pick.covered.length} de ${GAME_TYPES.length} tipos.</strong>
         ${pick.walls.length ? `Le cuesta contra: ${typeTagList(pick.walls)}` : "Ningún tipo resiste todos sus ataques."}</p>`
     : "";
   return `${title}
     <p class="set-role">${movesetRoleText(pick.s, pick.set)}</p>
     <ul class="set-cards">${items}</ul>
     ${cover}
-    <p class="loc-source">Calculado con las reglas de la 3.ª generación: el tipo decide si un ataque es físico o especial.
-      Cuenta potencia, precisión, STAB y cobertura. Ojo: en RFVH cada MT se gasta al usarla y cada tutor enseña una sola vez.</p>`;
+    <p class="loc-source">${GAME.gen === 3
+      ? "Calculado con las reglas de la 3.ª generación: el tipo decide si un ataque es físico o especial."
+      : `Calculado con las reglas de la ${GAME.gen}.ª generación: cada ataque es físico o especial por sí mismo.`}
+      Cuenta potencia, precisión, STAB y cobertura. ${GAME.movesNote}</p>`;
 }
 
 /* Render de la pestaña Mecánicas (una sola vez, al arrancar). */

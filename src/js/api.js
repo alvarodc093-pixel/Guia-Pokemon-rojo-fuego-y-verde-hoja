@@ -14,9 +14,10 @@ function safeUrl(url) {
   return typeof url === "string" && url.startsWith("https://") ? esc(url) : "";
 }
 
-/* Tipos en la 3.ª generación: past_types guarda los anteriores a cada cambio
-   (p. ej. Clefairy era Normal hasta que llegó el tipo Hada). */
-function gen3Types(raw) {
+/* Tipos en la generación del juego: past_types guarda los anteriores a cada cambio
+   (p. ej. Clefairy era Normal hasta que llegó el tipo Hada). En la 9.ª valen los actuales. */
+function gameTypes(raw) {
+  if (GAME.gen >= 9) return (raw.types || []).map((t) => esc(t.type.name));
   const past = (raw.past_types || [])
     .map((p) => ({ gen: dexIdFromUrl(p.generation && p.generation.url), types: p.types }))
     .filter((p) => p.gen >= 3)
@@ -34,13 +35,13 @@ function normalize(raw) {
     id: Number(raw.id),
     name: esc(raw.name),
     sprite: safeUrl(art),
-    types: gen3Types(raw),
+    types: gameTypes(raw),
     height: Number(raw.height) / 10, // m
     weight: Number(raw.weight) / 10, // kg
     abilities: (raw.abilities || []).map((a) => esc(a.ability.name)),
     stats: (raw.stats || []).map((s) => ({ name: esc(s.stat.name), value: Number(s.base_stat) })),
     baseExp: raw.base_experience == null ? null : Number(raw.base_experience),
-    frlg: extractFrlgMoves(raw.moves),
+    moves: extractGameMoves(raw.moves),
   };
 }
 
@@ -65,8 +66,9 @@ async function loadAll(list, { concurrency = 6 } = {}) {
     while (i < list.length) {
       const item = list[i++];
       try {
-        const live = await fetchPokemon(item.id);
-        ok.push({ ...item, ...live, name: live.name });
+        // Las formas regionales (Vulpix de Alola...) se piden por su nombre, pero conservan el nº de especie.
+        const live = await fetchPokemon(item.form || item.id);
+        ok.push({ ...item, ...live, id: item.id, name: item.slug });
       } catch {
         fail.push(item);
         ok.push({ ...item, name: item.slug, sprite: "", live: false });
@@ -82,7 +84,7 @@ function artworkUrl(id) {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
 }
 
-/* ---------- Pokédex: evoluciones y movimientos (datos FRLG) ---------- */
+/* ---------- Pokédex: evoluciones y movimientos del juego actual ---------- */
 
 async function fetchJSON(url) {
   const res = await fetch(url);
@@ -104,8 +106,8 @@ function dexIdFromUrl(url = "") {
   return m ? Number(m[1]) : null;
 }
 
-/* Movimientos aprendibles en Rojo Fuego / Verde Hoja, sacados del detalle crudo. */
-function extractFrlgMoves(moves = []) {
+/* Movimientos aprendibles en el juego (GAME.versionGroups), sacados del detalle crudo. */
+function extractGameMoves(moves = []) {
   const level = new Map();
   const machine = new Set();
   const tutor = new Set();
@@ -113,7 +115,7 @@ function extractFrlgMoves(moves = []) {
     const slug = m.move && m.move.name;
     if (!slug || !/^[a-z0-9-]+$/.test(slug)) continue; // también va en URLs y en el HTML
     for (const d of m.version_group_details || []) {
-      if (!d.version_group || d.version_group.name !== "firered-leafgreen") continue;
+      if (!d.version_group || !GAME.versionGroups.includes(d.version_group.name)) continue;
       const method = d.move_learn_method && d.move_learn_method.name;
       if (method === "level-up" && d.level_learned_at > 0) {
         if (!level.has(slug) || d.level_learned_at < level.get(slug)) level.set(slug, d.level_learned_at);
@@ -131,14 +133,14 @@ function extractFrlgMoves(moves = []) {
   };
 }
 
-/* Movimientos FRLG cuando solo tenemos los datos locales (sin normalize). */
+/* Movimientos del juego cuando solo tenemos los datos locales (sin normalize). */
 const rawCache = new Map();
-async function fetchFrlgMoves(id) {
-  if (rawCache.has(id)) return rawCache.get(id);
-  const raw = await fetchJSON(`${API}${id}`);
-  const frlg = extractFrlgMoves(raw.moves);
-  rawCache.set(id, frlg);
-  return frlg;
+async function fetchGameMoves(idOrSlug) {
+  if (rawCache.has(idOrSlug)) return rawCache.get(idOrSlug);
+  const raw = await fetchJSON(`${API}${idOrSlug}`);
+  const moves = extractGameMoves(raw.moves);
+  rawCache.set(idOrSlug, moves);
+  return moves;
 }
 
 const ITEM_ES = {
@@ -192,13 +194,14 @@ async function fetchEvoChain(id) {
   return tree;
 }
 
-/* PokéAPI sirve los valores actuales; past_values guarda los anteriores a cada cambio.
-   El valor de FRLG (grupo 7) es el del primer cambio posterior a la 3.ª generación
-   (se saltan Colosseum y XD, grupos 12 y 13, que también son de la 3.ª). */
+/* PokéAPI sirve los valores actuales (los de la 9.ª generación); past_values guarda
+   los anteriores a cada cambio. El valor de FRLG (grupo 7) es el del primer cambio
+   posterior a la 3.ª generación (se saltan Colosseum y XD, grupos 12 y 13, también de la 3.ª). */
 const FRLG_VG = 7;
 const GEN3_VG_LATER = new Set([12, 13]);
-function gen3Values(raw) {
+function gameValues(raw) {
   const out = { power: raw.power, accuracy: raw.accuracy, type: raw.type ? raw.type.name : null };
+  if (GAME.gen >= 9) return out;
   const later = (raw.past_values || [])
     .map((p) => ({ p, vg: dexIdFromUrl(p.version_group && p.version_group.url) }))
     .filter((x) => x.vg > FRLG_VG && !GEN3_VG_LATER.has(x.vg))
@@ -210,12 +213,13 @@ function gen3Values(raw) {
   return out;
 }
 
-/* Detalle de un movimiento: nombre en español, tipo, potencia y precisión en FRLG y nº de MT/MO. */
+/* Detalle de un movimiento: nombre en español, tipo, potencia y precisión en el juego,
+   categoría (física / especial) y nº de MT/MO. */
 const moveCache = new Map();
 async function fetchMoveDetail(slug) {
   if (moveCache.has(slug)) return moveCache.get(slug);
   const raw = await fetchJSON(`${API_ROOT}move/${slug}/`);
-  const g3 = gen3Values(raw);
+  const g3 = gameValues(raw);
   const meta = raw.meta || {};
   const out = {
     slug,
@@ -224,10 +228,11 @@ async function fetchMoveDetail(slug) {
     power: g3.power == null ? null : Number(g3.power),
     accuracy: g3.accuracy == null ? null : Number(g3.accuracy),
     status: !!(raw.damage_class && raw.damage_class.name === "status"),
+    physical: !!(raw.damage_class && raw.damage_class.name === "physical"),
     hits: meta.min_hits && meta.max_hits ? (meta.min_hits === meta.max_hits ? meta.min_hits : 3) : 1,
     mt: null,
   };
-  const mach = (raw.machines || []).find((m) => m.version_group && m.version_group.name === "firered-leafgreen");
+  const mach = (raw.machines || []).find((m) => m.version_group && GAME.versionGroups.includes(m.version_group.name));
   if (mach && mach.machine && mach.machine.url) {
     try {
       const mdata = await fetchJSON(mach.machine.url);
@@ -239,7 +244,7 @@ async function fetchMoveDetail(slug) {
   return out;
 }
 
-/* ---------- Pokédex 1-251: encuentros salvajes en FRLG (vía PokéAPI) ---------- */
+/* ---------- Pokédex: encuentros salvajes del juego (vía PokéAPI) ---------- */
 
 const METHOD_ES = {
   walk: "Hierba",
@@ -269,11 +274,12 @@ async function areaEs(slug) {
   return name;
 }
 
-/* Zonas salvajes del nº id en Rojo Fuego / Verde Hoja (máx. 4, por %).
+/* Zonas salvajes del nº id en el juego actual (máx. 4, por %).
    Devuelve [{area, method, levels, rate, eds: ["fire","leaf"]}]. */
 const encCache = new Map();
 async function fetchDexEncounters(id) {
   if (encCache.has(id)) return encCache.get(id);
+  if (!Object.keys(GAME.encounterVersions).length) return [];
   const list = await fetchJSON(`${API_ROOT}pokemon/${id}/encounters`);
   const groups = new Map();
   for (const e of list || []) {
@@ -281,14 +287,15 @@ async function fetchDexEncounters(id) {
     if (!area) continue;
     for (const v of e.version_details || []) {
       const ver = v.version && v.version.name;
-      if (ver !== "firered" && ver !== "leafgreen") continue;
+      const ed = GAME.encounterVersions[ver];
+      if (!ed) continue;
       for (const d of v.encounter_details || []) {
         const key = `${area}|${d.method.name}`;
         const g = groups.get(key) || { area, method: d.method.name, min: 99, max: 0, chance: 0, eds: new Set() };
         g.min = Math.min(g.min, Number(d.min_level));
         g.max = Math.max(g.max, Number(d.max_level));
         g.chance = Math.max(g.chance, Number(d.chance));
-        g.eds.add(ver === "firered" ? "fire" : "leaf");
+        g.eds.add(ed);
         groups.set(key, g);
       }
     }

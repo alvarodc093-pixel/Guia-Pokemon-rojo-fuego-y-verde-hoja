@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escarlata y Púrpura — Guía de ediciones Pokémon | Exclusivos y Pokédex</title>
+  <meta name="description" content="Guía en español de Pokémon Escarlata y Púrpura: Pokémon exclusivos de cada edición, Pokédex de Paldea, Noroteo y Arándano con sets recomendados, guía en vídeo y recursos." />
+  <meta name="theme-color" content="#1a0f2e" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://raw.githubusercontent.com https://upload.wikimedia.org https://i.ytimg.com; connect-src https://pokeapi.co; frame-src https://www.youtube-nocookie.com https://rankedboost.com; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta property="og:title" content="Guía de ediciones Pokémon — Escarlata y Púrpura" />
+  <meta property="og:description" content="Mitad escarlata, mitad púrpura: consulta los Pokémon exclusivos de cada edición, la Pokédex de Paldea con sets recomendados, marca tus capturas y aprende con vídeos." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/escarlata-purpura.html#pokedex" />
+  <meta property="og:url" content="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/escarlata-purpura.html#pokedex" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ee1c25'/%3E%3Cpath d='M4 50a46 46 0 0 0 92 0z' fill='%23fff' transform='rotate(180 50 50)'/%3E%3Crect x='4' y='45' width='92' height='10' fill='%23111'/%3E%3Ccircle cx='50' cy='50' r='14' fill='%23fff' stroke='%23111' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23fff' stroke='%23111' stroke-width='3'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://pokeapi.co" crossorigin />
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
+  <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+  <link rel="stylesheet" href="src/styles/main.css" />
+</head>
+<body data-game="sv">
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#portada" aria-label="Inicio — Guía de ediciones Pokémon: Escarlata y Púrpura">
+        <span class="brand-ball" aria-hidden="true"><span class="brand-ball-btn"></span></span>
+        <span class="brand-text">Guía de ediciones <strong>Pokémon</strong>
+          <small class="brand-game">Escarlata · Púrpura</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Navegación principal">
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Abrir menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#portada">Portada</a></li>
+          <li class="nav-drop">
+            <button class="nav-drop-btn" id="dexMenuBtn" type="button" aria-expanded="false" aria-controls="dexMenu">
+              Pokédex <span class="nav-drop-caret" aria-hidden="true">▾</span>
+            </button>
+            <ul class="nav-sub" id="dexMenu" aria-label="Ediciones de la guía" hidden>
+              <li><a href="index.html#pokedex" data-game="frlg"><span class="nav-sub-dot nav-sub-dot--frlg" aria-hidden="true"></span>Rojo Fuego y Verde Hoja</a></li>
+              <li><a href="escarlata-purpura.html#pokedex" data-game="sv" aria-current="page"><span class="nav-sub-dot nav-sub-dot--sv" aria-hidden="true"></span>Escarlata y Púrpura</a></li>
+            </ul>
+          </li>
+          <li><a href="#mecanicas" data-tab="mecanicas">Mecánicas</a></li>
+          <li><a href="#ediciones" data-tab="ediciones">Ediciones</a></li>
+          <li><a href="#mapa" data-tab="mapa">Mapa</a></li>
+          <li><a href="#guia" data-tab="guia">Guía en vídeo</a></li>
+          <li><a href="#recursos" data-tab="recursos">Recursos</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <!-- ============ PORTADA: pokéball + logo + split ============ -->
+    <section class="hero" id="portada" aria-labelledby="hero-title">
+      <div class="hero-split" aria-hidden="true">
+        <div class="hero-half hero-half--fire"></div>
+        <div class="hero-half hero-half--leaf"></div>
+      </div>
+
+      <div class="container hero-content">
+        <div class="pokeball" role="img" aria-label="Pokébola clásica roja y blanca">
+          <span class="pokeball-shine" aria-hidden="true"></span>
+          <span class="pokeball-band" aria-hidden="true"></span>
+          <span class="pokeball-button" aria-hidden="true"></span>
+        </div>
+
+        <img
+          class="pokemon-logo"
+          src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pok%C3%A9mon_logo.svg"
+          alt="Logotipo oficial de Pokémon"
+          width="420" height="153" fetchpriority="high"
+          data-fallback-text="Pokémon" />
+
+        <h1 id="hero-title" class="hero-title">
+          <span class="hero-title-fire">Escarlata</span>
+          <span class="hero-title-x">y</span>
+          <span class="hero-title-leaf">Púrpura</span>
+        </h1>
+        <p class="hero-subtitle">
+          Guía de las ediciones de <strong>Switch</strong> con sus dos DLC: consulta qué Pokémon son
+          <strong>exclusivos de cada edición</strong>, busca en la Pokédex de Paldea, marca tus capturas y aprende con vídeos.
+        </p>
+        <p class="hero-source">
+          Datos en vivo de <a href="https://pokeapi.co" target="_blank" rel="noopener">PokéAPI</a>
+          · Exclusivos verificados con <a href="https://www.serebii.net/scarletviolet/exclusives.shtml" target="_blank" rel="noopener">Serebii</a>
+          · Ubicaciones de <a href="https://rankedboost.com/pokemon/pokedex/scarlet-violet/" target="_blank" rel="noopener">RankedBoost</a>
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn--fire" href="#panel-fire" data-tab="ediciones" data-scroll="#panel-fire">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            Ver exclusivos Escarlata
+          </a>
+          <a class="btn btn--leaf" href="#panel-leaf" data-tab="ediciones" data-scroll="#panel-leaf">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            Ver exclusivos Púrpura
+          </a>
+          <a class="btn btn--ghost" href="#guia" data-tab="guia">Ir a la guía en vídeo</a>
+        </div>
+
+        <dl class="hero-stats" aria-label="Resumen de contenido">
+          <div><dt id="statFire">33</dt><dd>exclusivos Escarlata</dd></div>
+          <div><dt id="statLeaf">33</dt><dd>exclusivos Púrpura</dd></div>
+          <div><dt>66</dt><dd>en total para intercambiar</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="tabs-bar" id="tabsBar">
+      <div class="container">
+        <div class="tabs" role="tablist" aria-label="Secciones de la guía">
+          <button class="tab" role="tab" id="tab-pokedex" data-tab="pokedex" aria-selected="true" aria-controls="panel-pokedex">Pokédex</button>
+          <button class="tab" role="tab" id="tab-mecanicas" data-tab="mecanicas" aria-selected="false" aria-controls="panel-mecanicas" tabindex="-1">Mecánicas</button>
+          <button class="tab" role="tab" id="tab-ediciones" data-tab="ediciones" aria-selected="false" aria-controls="panel-ediciones" tabindex="-1">Ediciones</button>
+          <button class="tab" role="tab" id="tab-mapa" data-tab="mapa" aria-selected="false" aria-controls="panel-mapa" tabindex="-1">Mapa</button>
+          <button class="tab" role="tab" id="tab-guia" data-tab="guia" aria-selected="false" aria-controls="panel-guia" tabindex="-1">Guía en vídeo</button>
+          <button class="tab" role="tab" id="tab-recursos" data-tab="recursos" aria-selected="false" aria-controls="panel-recursos" tabindex="-1">Recursos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ POKÉDEX ============ -->
+    <section class="section tabpanel" id="panel-pokedex" data-panel="pokedex" role="tabpanel" aria-labelledby="tab-pokedex" tabindex="0">
+      <div class="container">
+        <p class="kicker">Paldea + Noroteo + Arándano · 664 Pokémon</p>
+        <h2 id="pokedex-title">Pokédex</h2>
+        <p class="section-lead">Toca un Pokémon para ver su ficha completa: imagen, ubicación y probabilidad de captura, la <strong>naturaleza óptima</strong> (y una alternativa), un <strong>set recomendado</strong> de cuatro ataques, evoluciones con sus niveles y todos sus ataques por nivel y por MT.</p>
+        <form class="dex-toolbar" id="dexFilterForm" role="search" aria-label="Buscar en la Pokédex">
+          <div class="dex-field">
+            <label for="dexQ">Buscar</label>
+            <input id="dexQ" name="dexQ" type="search" placeholder="Nombre o número… (ej.: sprigatito, 906)" autocomplete="off" />
+          </div>
+          <div class="dex-field">
+            <label for="dexGen">Región</label>
+            <select id="dexGen" name="dexGen">
+              <option value="all">Todas las regiones</option>
+              <option value="paldea">Solo Paldea (juego base)</option>
+              <option value="kitakami">Solo Noroteo (La máscara turquesa)</option>
+              <option value="blueberry">Solo Arándano (El disco índigo)</option>
+            </select>
+          </div>
+        </form>
+        <p class="dex-count" id="dexCount" role="status" aria-live="polite">664 Pokémon</p>
+        <div class="dex-layout">
+          <div class="dex-list-wrap">
+            <ol class="dex-list" id="dexList" aria-label="Lista de Pokémon de la Pokédex"></ol>
+          </div>
+          <article class="dex-detail" id="dexDetail" aria-live="polite" aria-label="Ficha del Pokémon seleccionado">
+            <p>Cargando la Pokédex…</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MECÁNICAS ============ -->
+    <section class="section section--alt tabpanel" id="panel-mecanicas" data-panel="mecanicas" role="tabpanel" aria-labelledby="tab-mecanicas" tabindex="0" hidden>
+      <div class="container">
+        <p class="kicker">Referencia del entrenador</p>
+        <h2 id="mecanicas-title">Naturalezas y tipos</h2>
+        <p class="section-lead">Las 25 naturalezas del juego con su nombre en español e inglés y qué hace cada una, más los 18 tipos con su símbolo, sus interacciones y la tabla completa de eficacias.</p>
+
+        <h3 class="mech-sub">Naturalezas <span class="mech-count">(25)</span></h3>
+        <p class="mech-note">Cada naturaleza sube una estadística un <strong>10%</strong> y baja otra un <strong>10%</strong>; las 5 neutras no cambian nada. En el juego, la estadística subida se pinta de <strong>rosa</strong> y la bajada de <strong>azul</strong> en la pantalla de Datos.</p>
+        <div class="nature-grid" id="natureGrid"></div>
+
+        <h3 class="mech-sub">Tipos <span class="mech-count">(18)</span></h3>
+        <p class="mech-note">Cada tipo con su símbolo, a qué hace doble de daño al atacar, qué le hace doble de daño, qué resiste y a qué es inmune.</p>
+        <div class="type-grid" id="typeGrid"></div>
+
+        <h3 class="mech-sub">Tabla de eficacias</h3>
+        <p class="mech-note">Fila = tipo del ataque · columna = tipo del defensor.</p>
+        <div class="table-wrap"><table class="chart-table" id="typeChart"></table></div>
+        <p class="map-fallback" id="chartLegend"></p>
+      </div>
+    </section>
+
+    <!-- ============ EDICIONES ============ -->
+    <section class="section tabpanel" id="panel-ediciones" data-panel="ediciones" role="tabpanel" aria-labelledby="tab-ediciones" tabindex="0" hidden>
+      <div class="container">
+        <h2 id="explorador-title" class="sr-only">Pokémon exclusivos de cada edición</h2>
+        <!-- ============ SPLIT ROJO / VERDE ============ -->
+        <div class="split">
+          <!-- Panel ROJO FUEGO -->
+          <section class="panel panel--fire" id="panel-fire" aria-labelledby="fire-title">
+            <header class="panel-head">
+              <h2 id="fire-title" class="panel-title sr-only">Exclusivos de Escarlata</h2>
+              <div class="game-logo game-logo--fire" role="img" aria-label="Logotipo de la edición Escarlata">
+                <span class="game-logo-flame" aria-hidden="true">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                </span>
+                <span class="game-logo-text"><small>Pokémon</small><strong>ESCARLATA</strong></span>
+                <span class="game-logo-mascot" aria-hidden="true">🔴 Koraidon</span>
+              </div>
+              <p class="panel-desc">Solo aparecen en <strong>Escarlata</strong>. Para completarlos necesitarás intercambiar con Púrpura.</p>
+              <p class="strip-caption">Los 33 exclusivos de Escarlata (juego base y DLC). Toca uno para ver su ficha:</p>
+              <div class="cutout-strip" id="strip-fire" role="group" aria-label="Exclusivos de Escarlata"></div>
+            </header>
+            <div class="panel-status" data-panel-status="fire" role="status" aria-live="polite"></div>
+            <ul class="card-grid" id="grid-fire" aria-label="Pokémon exclusivos de Escarlata"></ul>
+          </section>
+
+          <!-- Panel VERDE HOJA -->
+          <section class="panel panel--leaf" id="panel-leaf" aria-labelledby="leaf-title">
+            <header class="panel-head">
+              <h2 id="leaf-title" class="panel-title sr-only">Exclusivos de Púrpura</h2>
+              <div class="game-logo game-logo--leaf" role="img" aria-label="Logotipo de la edición Púrpura">
+                <span class="game-logo-flame" aria-hidden="true">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </span>
+                <span class="game-logo-text"><small>Pokémon</small><strong>PÚRPURA</strong></span>
+                <span class="game-logo-mascot" aria-hidden="true">🟣 Miraidon</span>
+              </div>
+              <p class="panel-desc">Solo aparecen en <strong>Púrpura</strong>. Para completarlos necesitarás intercambiar con Escarlata.</p>
+              <p class="strip-caption">Los 33 exclusivos de Púrpura (juego base y DLC). Toca uno para ver su ficha:</p>
+              <div class="cutout-strip" id="strip-leaf" role="group" aria-label="Exclusivos de Púrpura"></div>
+            </header>
+            <div class="panel-status" data-panel-status="leaf" role="status" aria-live="polite"></div>
+            <ul class="card-grid" id="grid-leaf" aria-label="Pokémon exclusivos de Púrpura"></ul>
+          </section>
+        </div>
+        <p class="map-fallback"><strong>Tauros de Paldea:</strong> aparece en las dos ediciones, pero con raza distinta:
+          la <strong>Llameante</strong> (Lucha/Fuego) solo en Escarlata y la <strong>Acuática</strong> (Lucha/Agua) solo en Púrpura.
+          La raza Combatiente (Lucha) sale en ambas.</p>
+      </div>
+    </section>
+
+    <!-- ============ MAPA ============ -->
+    <section class="section section--alt tabpanel" id="panel-mapa" data-panel="mapa" role="tabpanel" aria-labelledby="tab-mapa" tabindex="0" hidden>
+      <div class="container">
+        <p class="kicker">Explora Paldea</p>
+        <h2 id="mapa-title">Mapa interactivo de Paldea</h2>
+        <p class="section-lead">El mapa de Escarlata y Púrpura de RankedBoost, incrustado en la página: mueve, amplía y localiza zonas, cuevas y puntos de captura sin salir de aquí.</p>
+        <div class="map-frame">
+          <iframe id="gameMap" src="https://rankedboost.com/pokemon/location/scarlet-violet/" title="Mapa interactivo de Pokémon Escarlata y Púrpura (RankedBoost)" loading="lazy" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+        </div>
+        <p class="map-fallback">¿No se carga el mapa? <a href="https://rankedboost.com/pokemon/location/scarlet-violet/" target="_blank" rel="noopener">Abrirlo en RankedBoost</a>.</p>
+      </div>
+    </section>
+
+    <!-- ============ GUÍA EN VÍDEO ============ -->
+    <section class="section section--alt tabpanel" id="panel-guia" data-panel="guia" role="tabpanel" aria-labelledby="tab-guia" tabindex="0" hidden>
+      <div class="container">
+        <p class="kicker">Aprende jugando</p>
+        <h2 id="guia-title">Guía en vídeo: serie completa + trucos</h2>
+        <p class="section-lead">Una serie de episodios en español por toda Paldea, más vídeos con trucos (shiny, teraincursiones, crianza y DLC). Elige un vídeo de la lista y se reproduce aquí mismo, sin salir de la página.</p>
+        <div class="player-layout">
+          <div class="player-main">
+            <div class="player-frame">
+              <iframe id="ytPlayer" src="https://www.youtube-nocookie.com/embed/V9ADcwialA4?rel=0" title="Reproductor: guía en vídeo de Escarlata y Púrpura" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <h3 class="now-playing" id="nowPlaying">1 · Pokémon Escarlata Episodio 01: El COMIENZO de una nueva GENERACIÓN</h3>
+            <p class="player-alt"><a id="watchLink" href="https://www.youtube.com/watch?v=V9ADcwialA4&list=PLc50hsFWvO9mdh6d8zaF_sWCbjEThKoed" target="_blank" rel="noopener">Ver este vídeo en YouTube ↗</a></p>
+          </div>
+          <div class="playlist-wrap">
+            <h3 class="playlist-title">Serie completa <span id="epCount"></span></h3>
+            <ol class="playlist" id="playlistEps"></ol>
+            <h3 class="playlist-title">Trucos y DLC <span id="shortCount"></span></h3>
+            <ol class="playlist" id="playlistShorts"></ol>
+          </div>
+        </div>
+        <p class="map-fallback">Listas originales: <a href="https://www.youtube.com/playlist?list=PLc50hsFWvO9mdh6d8zaF_sWCbjEThKoed" target="_blank" rel="noopener">serie de Semfid0r</a>
+          y <a href="https://www.youtube.com/playlist?list=PLGJOjoqV9zLIyZ6UY2KZ6YFu51LlpditA" target="_blank" rel="noopener">trucos de Team Eevee</a> en YouTube.</p>
+      </div>
+    </section>
+
+    <!-- ============ RECURSOS ============ -->
+    <section class="section tabpanel" id="panel-recursos" data-panel="recursos" role="tabpanel" aria-labelledby="tab-recursos" tabindex="0" hidden>
+      <div class="container">
+        <p class="kicker">Para seguir investigando</p>
+        <h2 id="recursos-title">Páginas relacionadas</h2>
+        <ul class="link-grid">
+          <li><a class="link-card" href="https://rankedboost.com/pokemon/pokedex/scarlet-violet/" target="_blank" rel="noopener"><strong>RankedBoost — Pokédex Escarlata/Púrpura</strong><span>Fuente de ubicaciones usada en esta guía.</span></a></li>
+          <li><a class="link-card" href="https://pokeapi.co" target="_blank" rel="noopener"><strong>PokéAPI — API REST</strong><span>Sprites, tipos, estadísticas y ataques en vivo.</span></a></li>
+          <li><a class="link-card" href="https://www.wikidex.net/wiki/Gu%C3%ADa_de_Pok%C3%A9mon_Escarlata_y_Pok%C3%A9mon_P%C3%BArpura" target="_blank" rel="noopener"><strong>WikiDex — Guía de Escarlata y Púrpura</strong><span>Guía escrita paso a paso, en español.</span></a></li>
+          <li><a class="link-card" href="https://www.serebii.net/scarletviolet/" target="_blank" rel="noopener"><strong>Serebii — Scarlet / Violet</strong><span>Pokédex, teraincursiones, objetos y eventos.</span></a></li>
+          <li><a class="link-card" href="https://www.nintendo.com/" target="_blank" rel="noopener"><strong>Nintendo eShop</strong><span>El juego y sus DLC para Switch / Switch 2.</span></a></li>
+          <li><a class="link-card" href="https://home.pokemon.com/" target="_blank" rel="noopener"><strong>Pokémon HOME</strong><span>Trae a Paldea tus Pokémon de otros juegos.</span></a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>🌐 <strong>Página online:</strong> <a href="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex">https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex</a></p>
+      <p><strong>Guía no oficial de fans.</strong> Pokémon © Nintendo / Game Freak / Creatures Inc. Sprites y datos vía <a href="https://pokeapi.co" target="_blank" rel="noopener">PokéAPI</a>.</p>
+      <p><a href="#portada">Volver arriba ↑</a> · Hecha con HTML + CSS + JS modular, sin frameworks.</p>
+    </div>
+  </footer>
+
+  <!-- Modal detalle -->
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalName" id="modal">
+      <button class="modal-close" id="modalClose" aria-label="Cerrar detalle">✕</button>
+      <div class="modal-body" id="modalBody">
+        <p>Cargando…</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="src/js/games.js"></script>
+  <script src="src/js/data-sv.js"></script>
+  <script src="src/js/mechanics.js"></script>
+  <script src="src/js/api.js"></script>
+  <script src="src/js/ui.js"></script>
+  <script src="src/js/playlist-sv.js"></script>
+  <script src="src/js/app.js"></script>
+</body>
+</html>

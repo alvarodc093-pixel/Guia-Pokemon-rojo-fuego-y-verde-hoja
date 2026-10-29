@@ -3,6 +3,7 @@
    36 capítulos + 50 shorts. Para actualizarla, edita estas listas. */
 
 const PLAYLIST_ID = "PLMa4xzilcmBt-tBff6_m3KsLrLWPwA_6X";
+const SHORTS_PLAYLIST_ID = PLAYLIST_ID; // los shorts van en la misma lista
 
 const EPISODES = [
   { id: "GYlCV2q-iWk", title: "Pokémon Rojo Fuego #1 - Bulbasaur, Charmander o Squirtle" },

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pokémon Rojo Fuego y Verde Hoja — Guía de ediciones Switch 2 | Exclusivos</title>
+  <title>Rojo Fuego y Verde Hoja — Guía de ediciones Pokémon | Exclusivos y Pokédex</title>
   <meta name="description" content="Guía en español de Pokémon Rojo Fuego y Verde Hoja (Switch 2): qué Pokémon son exclusivos de cada edición, buscador con datos en vivo de PokéAPI, guía en vídeo y recursos oficiales." />
   <meta name="theme-color" content="#0f172a" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://raw.githubusercontent.com https://upload.wikimedia.org https://i.ytimg.com; connect-src https://pokeapi.co; frame-src https://www.youtube-nocookie.com https://rankedboost.com; object-src 'none'; base-uri 'self'; form-action 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta property="og:title" content="Pokémon Rojo Fuego y Verde Hoja — Guía de ediciones" />
+  <meta property="og:title" content="Guía de ediciones Pokémon — Rojo Fuego y Verde Hoja" />
   <meta property="og:description" content="Mitad roja, mitad verde: consulta los Pokémon exclusivos de cada edición, la Pokédex con sets recomendados, marca tus capturas y aprende con vídeos." />
   <meta property="og:type" content="website" />
   <link rel="canonical" href="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex" />
@@ -19,27 +19,15 @@
   <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
   <link rel="stylesheet" href="src/styles/main.css" />
 </head>
-<body>
+<body data-game="frlg">
   <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
-
-  <div class="live-banner" role="note" aria-label="Enlace a la página online">
-    <div class="container live-banner-inner">
-      <span aria-hidden="true">🌐</span>
-      <span><strong>Página online:</strong>
-        <a id="liveUrl" href="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex">pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex</a>
-      </span>
-      <span class="live-banner-actions">
-        <a class="live-btn" href="https://pokemon-rojo-fuego-verde-hojavercel.vercel.app/#pokedex" target="_blank" rel="noopener">Abrir ↗</a>
-        <button class="live-btn" type="button" id="copyLiveUrl">Copiar enlace</button>
-      </span>
-    </div>
-  </div>
 
   <header class="site-header" id="top">
     <div class="container header-inner">
-      <a class="brand" href="#portada" aria-label="Inicio — Guía Rojo Fuego y Verde Hoja">
+      <a class="brand" href="#portada" aria-label="Inicio — Guía de ediciones Pokémon: Rojo Fuego y Verde Hoja">
         <span class="brand-ball" aria-hidden="true"><span class="brand-ball-btn"></span></span>
-        <span class="brand-text">Guía <strong>Rojo Fuego</strong> · <strong>Verde Hoja</strong></span>
+        <span class="brand-text">Guía de ediciones <strong>Pokémon</strong>
+          <small class="brand-game">Rojo Fuego · Verde Hoja</small></span>
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
         <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Abrir menú">
@@ -47,7 +35,15 @@
         </button>
         <ul class="nav-menu" id="navMenu">
           <li><a href="#portada">Portada</a></li>
-          <li><a href="#pokedex" data-tab="pokedex">Pokédex</a></li>
+          <li class="nav-drop">
+            <button class="nav-drop-btn" id="dexMenuBtn" type="button" aria-expanded="false" aria-controls="dexMenu">
+              Pokédex <span class="nav-drop-caret" aria-hidden="true">▾</span>
+            </button>
+            <ul class="nav-sub" id="dexMenu" aria-label="Ediciones de la guía" hidden>
+              <li><a href="index.html#pokedex" data-game="frlg" aria-current="page"><span class="nav-sub-dot nav-sub-dot--frlg" aria-hidden="true"></span>Rojo Fuego y Verde Hoja</a></li>
+              <li><a href="escarlata-purpura.html#pokedex" data-game="sv"><span class="nav-sub-dot nav-sub-dot--sv" aria-hidden="true"></span>Escarlata y Púrpura</a></li>
+            </ul>
+          </li>
           <li><a href="#mecanicas" data-tab="mecanicas">Mecánicas</a></li>
           <li><a href="#ediciones" data-tab="ediciones">Ediciones</a></li>
           <li><a href="#mapa" data-tab="mapa">Mapa</a></li>
@@ -237,7 +233,7 @@
         <h2 id="mapa-title">Mapa interactivo de Kanto y las Archi7</h2>
         <p class="section-lead">El FRLG Map de RankedBoost, incrustado en la página: mueve, amplía y localiza rutas, cuevas y puntos de captura sin salir de aquí.</p>
         <div class="map-frame">
-          <iframe id="frlgMap" src="https://rankedboost.com/pokemon/location/firered-leafgreen/#megamap=4048,-960,0.085,region,-" title="Mapa interactivo de Pokémon Rojo Fuego y Verde Hoja (RankedBoost)" loading="lazy" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+          <iframe id="gameMap" src="https://rankedboost.com/pokemon/location/firered-leafgreen/#megamap=4048,-960,0.085,region,-" title="Mapa interactivo de Pokémon Rojo Fuego y Verde Hoja (RankedBoost)" loading="lazy" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
         </div>
         <p class="map-fallback">¿No se carga el mapa? <a href="https://rankedboost.com/pokemon/location/firered-leafgreen/" target="_blank" rel="noopener">Abrirlo en RankedBoost</a>.</p>
       </div>
@@ -305,6 +301,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+  <script src="src/js/games.js"></script>
   <script src="src/js/data.js"></script>
   <script src="src/js/mechanics.js"></script>
   <script src="src/js/api.js"></script>

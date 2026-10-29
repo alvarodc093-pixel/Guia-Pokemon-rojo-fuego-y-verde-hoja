@@ -1,6 +1,8 @@
 /* ============================================================
-   Guía Rojo Fuego / Verde Hoja — sistema de diseño
+   Guía de ediciones Pokémon — sistema de diseño
    Mobile-first · variables CSS · Grid + Flexbox
+   Cada juego (body[data-game]) redefine los colores de sus dos ediciones:
+   "fire" = Rojo Fuego / Escarlata y "leaf" = Verde Hoja / Púrpura.
    ============================================================ */
 :root {
   --color-fire: #d9261c;
@@ -9,6 +11,24 @@
   --color-leaf: #189a46;
   --color-leaf-dark: #0b5a28;
   --color-leaf-soft: #e7f7ee;
+  /* Matices de cada edición (portada, tarjetas y tiras) */
+  --fire-hi: #ff4b33;
+  --fire-tint: #ffd7d2;
+  --fire-card: #fff1f0;
+  --fire-media: #ffe9e7;
+  --fire-strip: #fff5f4;
+  --fire-strip-border: #f3c1bd;
+  --leaf-hi: #4ade80;
+  --leaf-tint: #d3f8df;
+  --leaf-deep: #062d18;
+  --leaf-card: #ecfdf3;
+  --leaf-media: #ddf5e6;
+  --leaf-strip: #f0faf4;
+  --leaf-strip-border: #b7e4c7;
+  /* Capturado: siempre verde, sea cual sea el juego */
+  --color-ok: #189a46;
+  --color-ok-dark: #0b5a28;
+  --color-ok-soft: #e7f7ee;
   --color-ink: #0f172a;
   --color-background: #f6f7fb;
   --color-surface: #ffffff;
@@ -40,6 +60,30 @@
   --max-w: 1180px;
 }
 
+/* Escarlata (rojo anaranjado de Koraidon) y Púrpura (violeta de Miraidon) */
+body[data-game="sv"] {
+  --color-fire: #e2401c;
+  --color-fire-dark: #84200a;
+  --color-fire-soft: #fff0ea;
+  --color-leaf: #7b3fc4;
+  --color-leaf-dark: #43197a;
+  --color-leaf-soft: #f3ecfd;
+  --fire-hi: #ff8a3d;
+  --fire-tint: #ffdccb;
+  --fire-card: #fff3ec;
+  --fire-media: #ffe6d9;
+  --fire-strip: #fff6f1;
+  --fire-strip-border: #f6c3a8;
+  --leaf-hi: #b98cf5;
+  --leaf-tint: #e9dcff;
+  --leaf-deep: #26093f;
+  --leaf-card: #f6f0ff;
+  --leaf-media: #ebe0fb;
+  --leaf-strip: #f8f4ff;
+  --leaf-strip-border: #d3bdf2;
+  --color-accent-ink: #4b2a91;
+}
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -68,26 +112,6 @@ a:hover { text-decoration-thickness: 2px; }
 
 :focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; border-radius: 4px; }
 
-/* ---------- Banner enlace página online ---------- */
-.live-banner {
-  background: linear-gradient(90deg, #0f172a, #1e3a8a);
-  color: #fff; font-size: 0.95rem;
-  border-bottom: 2px solid var(--color-accent);
-}
-.live-banner-inner {
-  display: flex; align-items: center; justify-content: center;
-  flex-wrap: wrap; gap: 8px 12px; padding-block: 10px; text-align: center;
-}
-.live-banner a { color: #ffe98a; font-weight: 700; overflow-wrap: anywhere; }
-.live-banner-actions { display: inline-flex; gap: 8px; }
-.live-btn {
-  display: inline-block; font: inherit; font-size: 0.85rem; font-weight: 800;
-  background: var(--color-accent); color: #111; border: 0; border-radius: 999px;
-  padding: 6px 14px; cursor: pointer; text-decoration: none;
-}
-.live-btn:hover { filter: brightness(1.08); }
-a.live-btn { color: #111; }
-
 /* ---------- Header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 50;
@@ -97,6 +121,8 @@ a.live-btn { color: #111; }
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
 .brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 600; }
+.brand-text { line-height: 1.15; }
+.brand-game { display: block; font-size: 0.75rem; font-weight: 700; color: var(--fire-tint); letter-spacing: 0.5px; }
 .brand-ball {
   width: 30px; height: 30px; border-radius: 50%; position: relative; flex: none;
   background: linear-gradient(to bottom, #ee1c25 50%, #fff 50%);
@@ -114,11 +140,30 @@ a.live-btn { color: #111; }
 .nav-menu a { display: block; padding: 10px 12px; border-radius: 8px; color: var(--color-text); text-decoration: none; font-weight: 600; }
 .nav-menu a:hover { background: #eef2ff; }
 
+/* Desplegable "Pokédex": elegir el juego */
+.nav-drop { position: relative; }
+.nav-drop-btn {
+  display: flex; align-items: center; gap: 6px; width: 100%; font: inherit; font-weight: 600;
+  background: transparent; border: 0; border-radius: 8px; padding: 10px 12px;
+  color: var(--color-text); cursor: pointer; text-align: left;
+}
+.nav-drop-btn:hover { background: #eef2ff; }
+.nav-drop-caret { font-size: 0.8em; transition: transform 0.2s ease; }
+.nav-drop-btn[aria-expanded="true"] .nav-drop-caret { transform: rotate(180deg); }
+.nav-sub { list-style: none; margin: 0 0 4px; padding: 0 0 0 12px; }
+.nav-sub[hidden] { display: none; }
+.nav-sub a { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap; }
+.nav-sub a[aria-current="page"] { font-weight: 800; }
+.nav-sub a[aria-current="page"]::after { content: "✓"; margin-left: auto; color: var(--color-ok); }
+.nav-sub-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; border: 1.5px solid rgb(0 0 0 / 0.25); }
+.nav-sub-dot--frlg { background: linear-gradient(90deg, #d9261c 50%, #189a46 50%); }
+.nav-sub-dot--sv { background: linear-gradient(90deg, #e2401c 50%, #7b3fc4 50%); }
+
 /* ---------- Hero / portada ---------- */
 .hero { position: relative; overflow: clip; color: #fff; background: var(--color-ink); }
 .hero-split { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; }
-.hero-half--fire { background: linear-gradient(135deg, #ff4b33 0%, var(--color-fire) 45%, var(--color-fire-dark) 100%); }
-.hero-half--leaf { background: linear-gradient(225deg, #4ade80 0%, var(--color-leaf) 45%, var(--color-leaf-dark) 100%); }
+.hero-half--fire { background: linear-gradient(135deg, var(--fire-hi) 0%, var(--color-fire) 45%, var(--color-fire-dark) 100%); }
+.hero-half--leaf { background: linear-gradient(225deg, var(--leaf-hi) 0%, var(--color-leaf) 45%, var(--color-leaf-dark) 100%); }
 .hero-split::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgb(15 23 42 / 0.15), rgb(15 23 42 / 0.55)); }
 .hero-content { position: relative; z-index: 2; text-align: center; padding-block: var(--spacing-2xl); }
 .hero-content a:not(.btn) { color: #ffe98a; }
@@ -148,7 +193,7 @@ a.live-btn { color: #111; }
   text-shadow: 4px 4px 0 var(--color-accent-ink); margin: 0;
 }
 .hero-title { margin: 8px 0 4px; font-size: clamp(1.6rem, 4.5vw, 2.8rem); line-height: 1.1; text-shadow: 0 2px 12px rgb(0 0 0 / 0.5); }
-.hero-title-fire { color: #ffd7d2; } .hero-title-leaf { color: #d3f8df; } .hero-title-x { opacity: 0.85; font-weight: 400; margin-inline: 6px; }
+.hero-title-fire { color: var(--fire-tint); } .hero-title-leaf { color: var(--leaf-tint); } .hero-title-x { opacity: 0.85; font-weight: 400; margin-inline: 6px; }
 .hero-subtitle { max-width: 62ch; margin: 0 auto; font-size: 1.05rem; color: #f1f5f9; }
 .hero-source { font-size: 0.9rem; color: #e2e8f0; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: var(--spacing-lg); }
@@ -168,8 +213,8 @@ a.live-btn { color: #111; }
 .btn:active { transform: translateY(0); }
 .btn--fire { background: #fff; color: var(--color-fire-dark); border-color: #fff; box-shadow: var(--shadow-sm); }
 .btn--fire:hover { background: var(--color-accent); border-color: var(--color-accent); color: #111; }
-.btn--leaf { background: #062d18; color: #d3f8df; border-color: #fff; }
-.btn--leaf:hover { background: #0b5a28; }
+.btn--leaf { background: var(--leaf-deep); color: var(--leaf-tint); border-color: #fff; }
+.btn--leaf:hover { background: var(--color-leaf-dark); }
 .btn--ghost { background: transparent; color: #fff; border-color: rgb(255 255 255 / 0.7); }
 .btn--ghost:hover { background: rgb(255 255 255 / 0.15); }
 .btn--dark { background: var(--color-ink); color: #fff; }
@@ -190,7 +235,7 @@ a.live-btn { color: #111; }
 .tabpanel[hidden] { display: none; }
 .tabpanel:focus { outline: none; }
 .tabpanel:focus-visible { outline: 3px solid var(--color-accent); outline-offset: -3px; }
-.nav-menu a.active { background: rgb(255 255 255 / 0.16); color: #fff; }
+.nav-menu a.active, .nav-drop-btn.active { background: #eef2ff; color: var(--color-ink); }
 
 /* ---------- Mapa incrustado ---------- */
 .map-frame {
@@ -216,7 +261,7 @@ a.live-btn { color: #111; }
 .playlist-item .pl-num { font-weight: 800; color: var(--color-muted); font-size: 0.85rem; flex: none; width: 30px; text-align: right; }
 .playlist-item .pl-title { font-size: 0.85rem; font-weight: 600; line-height: 1.3; }
 .playlist-item:hover { border-color: var(--color-accent-ink); }
-.playlist-item[aria-current="true"] { border-color: var(--color-fire); background: #fff5f4; }
+.playlist-item[aria-current="true"] { border-color: var(--color-fire); background: var(--fire-strip); }
 
 /* ---------- Pokédex: lista + ficha ---------- */
 .dex-toolbar { display: grid; gap: 12px; margin-top: var(--spacing-lg); }
@@ -239,8 +284,8 @@ a.live-btn { color: #111; }
 .dex-card:hover img { transform: scale(1.07); }
 .dex-card.is-current { border-color: var(--color-fire); box-shadow: var(--shadow-md); }
 .dex-cell { position: relative; }
-.dex-cell.is-caught .dex-card { border-color: var(--color-leaf); background: linear-gradient(180deg, #fff 60%, #e7f7ee); }
-.dex-cell.is-caught .dex-card-name::after { content: " ✓"; color: var(--color-leaf-dark); font-weight: 900; }
+.dex-cell.is-caught .dex-card { border-color: var(--color-ok); background: linear-gradient(180deg, #fff 60%, var(--color-ok-soft)); }
+.dex-cell.is-caught .dex-card-name::after { content: " ✓"; color: var(--color-ok-dark); font-weight: 900; }
 /* Pokéball de captura: visible en la esquina de cada recuadro, misma en Pokédex y ediciones. */
 .dex-ball,
 .poke-ball {
@@ -273,7 +318,7 @@ a.live-btn { color: #111; }
 .dex-ball[aria-pressed="false"]:hover, .poke-ball[aria-pressed="false"]:hover { filter: grayscale(0.3); opacity: 0.95; }
 /* Capturado: a todo color + halo dorado/verde */
 .dex-ball.is-caught, .poke-ball.is-caught { filter: none; opacity: 1; box-shadow: 0 0 0 3px var(--color-accent), var(--shadow-sm); }
-.dex-ball.is-caught .ball-center > span, .poke-ball.is-caught .ball-center > span { background: var(--color-leaf); }
+.dex-ball.is-caught .ball-center > span, .poke-ball.is-caught .ball-center > span { background: var(--color-ok); }
 /* Animación de captura: meneo + apertura + destello */
 .dex-ball.catching, .poke-ball.catching { animation: ballShake 0.55s ease; }
 .dex-ball.catching .ball-half--top, .poke-ball.catching .ball-half--top { animation: ballOpenTop 0.55s ease; }
@@ -307,7 +352,7 @@ a.live-btn { color: #111; }
 .dex-sub { margin: 18px 0 8px; font-size: 1.1rem; }
 .evo-tree { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
 .evo-node { display: grid; justify-items: center; gap: 2px; background: #f8fafc; border: 1.5px solid var(--color-border); border-radius: var(--radius-md); padding: 10px 14px; min-width: 110px; }
-.evo-node[aria-current="true"] { border-color: var(--color-fire); background: #fff5f4; box-shadow: var(--shadow-sm); }
+.evo-node[aria-current="true"] { border-color: var(--color-fire); background: var(--fire-strip); box-shadow: var(--shadow-sm); }
 .evo-node img { width: 72px; height: 72px; object-fit: contain; }
 .evo-num { font-size: 0.75rem; font-weight: 800; color: var(--color-muted); letter-spacing: 1px; }
 .evo-name { font-weight: 700; text-transform: capitalize; }
@@ -367,23 +412,23 @@ a.live-btn { color: #111; }
   position: relative;
 }
 .poke-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.poke-card.is-caught { border-color: var(--color-leaf); border-width: 2px; box-shadow: 0 0 0 2px #bbf7d0; }
-.panel--fire .poke-card { background: linear-gradient(180deg, #fff 55%, #fff1f0); }
-.panel--leaf .poke-card { background: linear-gradient(180deg, #fff 55%, #ecfdf3); }
+.poke-card.is-caught { border-color: var(--color-ok); border-width: 2px; box-shadow: 0 0 0 2px #bbf7d0; }
+.panel--fire .poke-card { background: linear-gradient(180deg, #fff 55%, var(--fire-card)); }
+.panel--leaf .poke-card { background: linear-gradient(180deg, #fff 55%, var(--leaf-card)); }
 .poke-media { background: radial-gradient(circle at 50% 35%, rgb(255 255 255 / 0.9), transparent 70%), #f1f5f9; padding: 10px 8px 6px; text-align: center; position: relative; }
-.panel--fire .poke-media { background: radial-gradient(circle at 50% 35%, #fff, transparent 70%), #ffe9e7; }
-.panel--leaf .poke-media { background: radial-gradient(circle at 50% 35%, #fff, transparent 70%), #ddf5e6; }
+.panel--fire .poke-media { background: radial-gradient(circle at 50% 35%, #fff, transparent 70%), var(--fire-media); }
+.panel--leaf .poke-media { background: radial-gradient(circle at 50% 35%, #fff, transparent 70%), var(--leaf-media); }
 .poke-media img { width: 76px; height: 76px; object-fit: contain; image-rendering: auto; }
 .caught-ribbon {
   position: absolute; left: 6px; top: 6px; z-index: 2;
   font-size: 0.62rem; font-weight: 900; letter-spacing: 0.4px;
-  background: var(--color-leaf); color: #fff; border-radius: 999px; padding: 2px 8px;
+  background: var(--color-ok); color: #fff; border-radius: 999px; padding: 2px 8px;
   box-shadow: var(--shadow-sm);
 }
 .poke-body { padding: 8px 8px 10px; display: grid; gap: 4px; }
 .poke-dex { font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; color: var(--color-muted); }
 .poke-name { margin: 0; font-size: 0.9rem; text-transform: capitalize; line-height: 1.2; min-height: 2.1em; }
-.poke-card.is-caught .poke-name::after { content: " ✓"; color: var(--color-leaf-dark); font-weight: 900; }
+.poke-card.is-caught .poke-name::after { content: " ✓"; color: var(--color-ok-dark); font-weight: 900; }
 .poke-types { display: flex; gap: 4px; flex-wrap: wrap; }
 .poke-types .type-chip { font-size: 0.62rem; padding: 2px 8px; }
 .type-chip {
@@ -424,7 +469,7 @@ a.live-btn { color: #111; }
   content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px;
   border-radius: 50%; background: #fff; border: 1.5px solid #111; transform: translate(-50%, -50%);
 }
-.catch-btn[aria-pressed="true"] { background: #dcfce7; border: 1.5px solid var(--color-leaf); color: #14532d; }
+.catch-btn[aria-pressed="true"] { background: #dcfce7; border: 1.5px solid var(--color-ok); color: #14532d; }
 .catch-btn.catching { animation: ballShake 0.55s ease; }
 
 .skeleton {
@@ -442,8 +487,8 @@ a.live-btn { color: #111; }
   background: rgb(255 255 255 / 0.75); border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
-.panel--fire .cutout-strip { background: #fff5f4; border-color: #f3c1bd; }
-.panel--leaf .cutout-strip { background: #f0faf4; border-color: #b7e4c7; }
+.panel--fire .cutout-strip { background: var(--fire-strip); border-color: var(--fire-strip-border); }
+.panel--leaf .cutout-strip { background: var(--leaf-strip); border-color: var(--leaf-strip-border); }
 .cutout-btn {
   border: 2px solid transparent; border-radius: 10px; background: #fff;
   padding: 2px; cursor: pointer; line-height: 0; box-shadow: var(--shadow-sm);
@@ -602,6 +647,15 @@ a.live-btn { color: #111; }
   .nav-menu { display: flex; position: static; background: transparent; box-shadow: none; padding: 0; min-width: 0; gap: 2px; }
   .nav-menu a { color: #e2e8f0; padding: 8px 12px; }
   .nav-menu a:hover { background: rgb(255 255 255 / 0.12); color: #fff; }
+  .nav-drop-btn { color: #e2e8f0; padding: 8px 12px; }
+  .nav-drop-btn:hover { background: rgb(255 255 255 / 0.12); color: #fff; }
+  .nav-menu a.active, .nav-drop-btn.active { background: rgb(255 255 255 / 0.16); color: #fff; }
+  .nav-sub {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; min-width: 250px;
+    background: #fff; border-radius: 12px; box-shadow: var(--shadow-md); padding: 8px; margin: 0;
+  }
+  .nav-sub a, .nav-sub a:hover { color: var(--color-text); padding: 10px 12px; }
+  .nav-sub a:hover { background: #eef2ff; }
   .link-grid { grid-template-columns: repeat(2, 1fr); }
   .set-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dex-toolbar { grid-template-columns: 2fr 1fr; align-items: end; }

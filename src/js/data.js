@@ -2,7 +2,7 @@
    y localizaciones RankedBoost FRLG. Deoxys se documenta aparte (forma Ataque /
    Defensa) porque PokéAPI lo sirve como un único nº 386. */
 
-const FIRE_RED = [
+const EXCL_FIRE = [ // exclusivos de Rojo Fuego
   { id: 23, slug: "ekans", types: ["poison"] },
   { id: 24, slug: "arbok", types: ["poison"] },
   { id: 43, slug: "oddish", types: ["grass", "poison"] },
@@ -27,7 +27,7 @@ const FIRE_RED = [
   { id: 239, slug: "elekid", types: ["electric"] },
 ];
 
-const LEAF_GREEN = [
+const EXCL_LEAF = [ // exclusivos de Verde Hoja
   { id: 27, slug: "sandshrew", types: ["ground"] },
   { id: 28, slug: "sandslash", types: ["ground"] },
   { id: 37, slug: "vulpix", types: ["fire"] },
@@ -52,33 +52,6 @@ const LEAF_GREEN = [
   { id: 240, slug: "magby", types: ["fire"] },
   { id: 298, slug: "azurill", types: ["normal"] },
 ];
-
-const ALL_EXCLUSIVES = [
-  ...FIRE_RED.map((p) => ({ ...p, edition: "fire" })),
-  ...LEAF_GREEN.map((p) => ({ ...p, edition: "leaf" })),
-];
-
-/* Etiquetas de tipos en español para la UI */
-const TYPE_ES = {
-  normal: "Normal",
-  fire: "Fuego",
-  water: "Agua",
-  grass: "Planta",
-  electric: "Eléctrico",
-  ice: "Hielo",
-  fighting: "Lucha",
-  poison: "Veneno",
-  ground: "Tierra",
-  flying: "Volador",
-  psychic: "Psíquico",
-  bug: "Bicho",
-  rock: "Roca",
-  ghost: "Fantasma",
-  dark: "Siniestro",
-  dragon: "Dragón",
-  steel: "Acero",
-  fairy: "Hada",
-};
 
 /* Dónde capturarlos, según RankedBoost FRLG
    (https://rankedboost.com/pokemon/pokedex/firered-leafgreen/).
@@ -262,7 +235,7 @@ const LOC = {
 
 };
 
-/* Pokédex completa: Kanto (1-151) + Johto (152-251). */
+/* Pokédex completa: Kanto (1-151) + Johto (152-251); la región sale del nº. */
 const DEX_ALL = [
   { id: 1, slug: "bulbasaur" },
   { id: 2, slug: "ivysaur" },
