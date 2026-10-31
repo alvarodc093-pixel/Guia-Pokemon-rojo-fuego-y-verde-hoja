@@ -12,7 +12,7 @@
 
 - **Qué es:** una web sin frameworks ni build. Cada juego tiene su página con la misma estructura y sus propios colores. Se pasa de uno a otro desde el desplegable «Pokédex» del menú.
 - **Juegos:** Rojo Fuego y Verde Hoja (`index.html`) y Escarlata y Púrpura con sus dos DLC (`escarlata-purpura.html`).
-- **Datos:** PokéAPI para estadísticas, evoluciones y ataques; RankedBoost para las ubicaciones; Serebii para los exclusivos de Escarlata y Púrpura.
+- **Datos:** PokéAPI para estadísticas, evoluciones y ataques; RankedBoost y Serebii para las ubicaciones (Serebii también para los exclusivos y los DLC de Escarlata y Púrpura).
 - **Destacado:** cada ficha calcula la naturaleza óptima a partir de las estadísticas base, propone un set de cuatro ataques con las reglas de la generación del juego y muestra dónde capturar el Pokémon con su probabilidad.
 - **Calidad:** accesible con teclado, responsive y con datos de respaldo si falla la API.
 
@@ -41,7 +41,7 @@ La interfaz es accesible con teclado (pestañas con flechas, modal y desplegable
 
 - **Estadísticas, tipos, evoluciones y ataques:** PokéAPI, con caché en memoria y datos locales de respaldo si falla la conexión. Los ataques se filtran por los grupos de versión de cada juego (`firered-leafgreen`; `scarlet-violet`, `the-teal-mask` y `the-indigo-disk`).
 - **Rojo Fuego y Verde Hoja:** ubicaciones de Kanto de la [Pokédex FRLG de RankedBoost](https://rankedboost.com/pokemon/pokedex/firered-leafgreen/), guardadas en `src/js/data.js`. Para Johto se usan los encuentros de PokéAPI. Exclusivos contrastados con las guías del relanzamiento (febrero de 2026) y con RankedBoost. Potencias, precisiones y tipos de la 3.ª generación (PokéAPI los da en `past_values`).
-- **Escarlata y Púrpura:** `src/js/data-sv.js` se genera con `tools/build_sv_data.py`, que junta las tres Pokédex regionales de PokéAPI (con los nombres oficiales en español), los [exclusivos de Serebii](https://www.serebii.net/scarletviolet/exclusives.shtml) y las ubicaciones de RankedBoost, con las zonas traducidas a sus nombres oficiales (Área 1 del sur, Sierra Napada, Bosquejada...). RankedBoost no tiene páginas para los Pokémon de los DLC, así que esas fichas enlazan a Serebii. Las formas regionales que salen en el juego (Wooper y Tauros de Paldea, Vulpix y Sandshrew de Alola) se muestran con su forma. Tauros de Paldea se explica en una nota, porque sus razas Llameante y Acuática comparten el nº 128.
+- **Escarlata y Púrpura:** `src/js/data-sv.js` se genera con `tools/build_sv_data.py`, que junta las tres Pokédex regionales de PokéAPI (con los nombres oficiales en español), los [exclusivos de Serebii](https://www.serebii.net/scarletviolet/exclusives.shtml) y las ubicaciones de los 664 Pokémon. Las ubicaciones salen de la ficha de Serebii de cada uno y van separadas por parte del juego (Paldea, Noroteo de *La máscara turquesa* y Arándano de *El disco índigo*) y por edición: zonas, encuentros fijos, Pokémon dominantes, teraincursiones, biomas, formas y razas, y cómo se consigue si no es salvaje (evolución, intercambio, inicial, regalo...). En Paldea se añaden los niveles y el % de aparición de RankedBoost. Todo se traduce a los nombres oficiales en español (Área 1 del sur, Sierra Napada, Soto Sempiterno, Área Polar...). Las formas regionales que salen en el juego (Wooper y Tauros de Paldea, Vulpix y Sandshrew de Alola) se muestran con su forma. Tauros de Paldea se explica en una nota, porque sus razas Llameante y Acuática comparten el nº 128.
 - **Naturalezas y sets:** calculados en `src/js/mechanics.js` a partir de las estadísticas base y de los ataques que aprende en el juego.
 - **Imágenes de cabecera de Rojo Fuego y Verde Hoja:** recortes de una tabla de exclusivos, generados con los scripts de `tools/`.
 
@@ -76,7 +76,7 @@ python -m http.server 5500   # http://localhost:5500
 
 Cada página carga `games.js`, sus datos y su playlist, y después los scripts comunes. Para añadir otro juego basta con una entrada nueva en `GAMES`, sus ficheros de datos y playlist, una página HTML y una opción en el desplegable.
 
-Para regenerar los datos de Escarlata y Púrpura (descarga unas 700 especies; la caché evita repetirlo):
+Para regenerar los datos de Escarlata y Púrpura (descarga unas 700 especies de PokéAPI y sus fichas de RankedBoost y Serebii; la caché evita repetirlo):
 
 ```bash
 python tools/build_sv_data.py [carpeta_de_cache]

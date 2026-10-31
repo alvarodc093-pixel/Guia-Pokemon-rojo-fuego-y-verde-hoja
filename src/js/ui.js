@@ -284,6 +284,7 @@ function locationsHTML(p, src) {
   const loc = LOC[p.id];
   const slug = p.slug || p.name || "";
   const name = displayName(slug);
+  if (loc?.parts?.length) return partsLocationsHTML(loc, slug, name);
   // Sin datos de RankedBoost, en Escarlata/Púrpura su ficha suele no existir: mejor Serebii.
   const link = src || (!loc && GAME.serebii
     ? { url: GAME.serebii(slug), label: `Serebii · ficha de ${name}` }
@@ -306,6 +307,48 @@ function locationsHTML(p, src) {
   if (!inner) inner = `<p>Sin datos de captura. Consulta su ficha completa.</p>`;
   return `<h3 style="margin:12px 0 6px">Dónde capturarlo 📍</h3>${inner}
     <p class="loc-source">Fuente: <a href="${link.url}" target="_blank" rel="noopener">${link.label}</a></p>`;
+}
+
+/* Escarlata/Púrpura: una tarjeta por parte del juego (Paldea, Noroteo, Arándano) y, si
+   cambia, una línea por edición. En Paldea, las filas de RankedBoost dan niveles y %. */
+function partsLocationsHTML(loc, slug, name) {
+  const rbRows = (loc.w || []).map(([area, method, levels, rate]) =>
+    `<li><strong>${area}</strong> · ${method} · ${levels}${rate ? ` <span class="loc-rate" title="Probabilidad de aparición">${rate}</span>` : ""}</li>`).join("");
+  const parts = loc.parts.map((part) => {
+    const withRb = part.p === "paldea" && rbRows;
+    const rbAreas = withRb ? new Set(loc.w.flatMap((r) => r[0].split(", "))) : null;
+    const eds = part.v ? [["fire", part.s], ["leaf", part.v]] : [[null, part.s]];
+    const body = eds.map(([ed, e]) => locEntryHTML(e, ed, rbAreas)).join("");
+    return `<section class="loc-part loc-part--${part.p}">
+      <h4 class="loc-part-title">${GAME.parts[part.p]}</h4>
+      ${withRb ? `<ul class="loc-list">${rbRows}</ul>` : ""}${body}
+      ${part.b ? `<p class="loc-biomes">Biomas: ${part.b}</p>` : ""}
+    </section>`;
+  }).join("");
+  return `<h3 style="margin:12px 0 6px">Dónde capturarlo 📍</h3>
+    <div class="loc-parts">${parts}</div>
+    <p class="loc-source">Fuente: <a href="${GAME.serebii(slug)}" target="_blank" rel="noopener">Serebii · ficha de ${name}</a>
+      (zonas por edición y DLC)${loc.w && loc.w.length ? ` · <a href="${GAME.rankedBoost(slug)}" target="_blank" rel="noopener">RankedBoost</a> (niveles y % en Paldea)` : ""}</p>`;
+}
+
+/* Una edición dentro de una parte: zonas, encuentros fijos, dominante, teraincursiones y notas.
+   rbAreas: zonas que ya salen en las filas de RankedBoost (más detalladas); del resto
+   solo se añaden las que faltan, como "También en". */
+function locEntryHTML(e = {}, ed, rbAreas) {
+  const items = [];
+  for (const [label, areas] of e.a || []) {
+    const rest = rbAreas && !label ? areas.filter((a) => !rbAreas.has(a)) : areas;
+    if (!rest.length) continue;
+    const head = label ? `<strong>${label}:</strong> ` : rbAreas ? "<strong>También en:</strong> " : "";
+    items.push(head + rest.join(", "));
+  }
+  if (e.t) items.push(`<strong>Pokémon dominante:</strong> ${e.t.join(", ")}`);
+  if (e.f) items.push(`<strong>Encuentro fijo:</strong> ${e.f.join(", ")}`);
+  if (e.r) items.push(`<strong>Teraincursiones:</strong> ${e.r}`);
+  for (const n of e.n || []) items.push(n);
+  if (!items.length) return "";
+  const list = `<ul class="loc-list">${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+  return ed ? `<div class="loc-ed loc-ed--${ed}"><p class="loc-ed-name">${editionName(ed, { icon: true })}</p>${list}</div>` : list;
 }
 
 /* Ubicaciones salvajes fuera de RankedBoost (encuentros de PokéAPI). */

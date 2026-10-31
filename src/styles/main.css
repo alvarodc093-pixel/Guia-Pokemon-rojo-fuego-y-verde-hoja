@@ -554,6 +554,21 @@ a:hover { text-decoration-thickness: 2px; }
   font-size: 0.78rem; font-weight: 800; white-space: nowrap;
 }
 .loc-evo { margin: 6px 0; }
+/* Escarlata/Púrpura: una tarjeta por parte del juego */
+.loc-parts { display: grid; gap: 10px; margin: 8px 0; }
+.loc-part {
+  border: 1px solid var(--color-border); border-left: 5px solid var(--color-fire);
+  border-radius: var(--radius-md); padding: 10px 14px; background: #fff;
+}
+.loc-part--kitakami { border-left-color: #2f9e8f; }
+.loc-part--blueberry { border-left-color: #2f6fd6; }
+.loc-part-title { margin: 0 0 4px; font-size: 1rem; }
+.loc-part .loc-list { margin: 4px 0; }
+.loc-ed { margin-top: 6px; }
+.loc-ed-name { margin: 0; font-weight: 800; font-size: 0.9rem; }
+.loc-ed--fire .loc-ed-name { color: var(--color-fire-dark); }
+.loc-ed--leaf .loc-ed-name { color: var(--color-leaf-dark); }
+.loc-biomes { margin: 4px 0 0; font-size: 0.88rem; color: var(--color-muted); }
 .loc-source { font-size: 0.88rem; color: var(--color-muted); margin: 6px 0 0; }
 
 /* ---------- Recursos ---------- */

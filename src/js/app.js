@@ -444,7 +444,7 @@ function renderDexList() {
 /* Sección de obtención: RankedBoost > encuentros PokeAPI > cadena/especie. */
 async function dexLocSection(p, evo) {
   const loc = LOC[p.id];
-  if (loc && (loc.w.length || loc.e)) {
+  if (loc && (loc.w.length || loc.e || (loc.parts && loc.parts.length))) {
     // En RFVH, Johto no viene de RankedBoost (ver data.js): se enlaza la Pokédex oficial.
     const src = GAME.id === "frlg" && p.id > 151
       ? { url: `https://www.pokemon.com/es/pokedex/${p.slug}`, label: `Pokédex oficial · ${displayName(p.slug)}` }

@@ -48,7 +48,13 @@ const GAMES = {
     rankedBoost: (slug) => `https://rankedboost.com/pokemon-scarlet-violet/${slug}/`,
     rankedBoostLabel: "Escarlata/Púrpura",
     movesNote: "En Escarlata/Púrpura las MT no se gastan: se fabrican con materiales en cualquier Centro Pokémon.",
-    noWildText: "RankedBoost no tiene su ubicación (no cubre los DLC ni todos los encuentros). Consulta dónde encontrarlo en su ficha de Serebii.",
+    noWildText: "No aparece en estado salvaje en Paldea, Noroteo ni Arándano: se consigue por Pokémon HOME o intercambio.",
+    // Partes del juego en las ubicaciones (LOC[id].parts, de Serebii)
+    parts: {
+      paldea: "Paldea",
+      kitakami: "Noroteo · La máscara turquesa",
+      blueberry: "Arándano · El disco índigo",
+    },
     serebii: (slug) => `https://www.serebii.net/pokedex-sv/${slug.replace(/-/g, "")}/`,
   },
 };
